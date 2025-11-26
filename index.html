@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zay - E-commerce Website</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="animated-bg"></div>
+    
+  
+
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html">Zay</a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#" class="search-icon"><i class="fas fa-search"></i></a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="#" class="user-icon"><i class="fas fa-user"></i></a>
+            </div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+
+    <section class="hero">
+        <div class="hero-slider">
+            <div class="hero-slide active">
+                <div class="container">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h1>The Device That Takes You Higher</h1>
+                            <h2>Latest Inventions, Dazzling Design</h2>
+                            <p>Discover cutting-edge technology and innovative products that elevate your lifestyle. Shop the latest trends in electronics, fashion, and accessories.</p>
+                            <a href="shop.html" class="btn btn-primary" style="margin-top: 20px;">View Collection</a>
+                        </div>
+                        <div class="hero-image">
+                            <div class="product-image">
+                                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=700&fit=crop&q=90" alt="Smart Watch">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-slide">
+                <div class="container">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h1>Shop Now & Save Big</h1>
+                            <h2>Premium Quality, Best Prices</h2>
+                            <p>Explore our extensive collection of premium products. From smart devices to fashion essentials, we have everything you need.</p>
+                            <a href="shop.html" class="btn btn-primary" style="margin-top: 20px;">Shop Now</a>
+                        </div>
+                        <div class="hero-image">
+                            <div class="product-image">
+                                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=700&fit=crop&q=90" alt="Running Shoes">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="hero-prev"><i class="fas fa-chevron-left"></i></button>
+        <button class="hero-next"><i class="fas fa-chevron-right"></i></button>
+        <div class="hero-indicators">
+            <span class="indicator active"></span>
+            <span class="indicator"></span>
+        </div>
+    </section>
+
+
+    <section class="promo-banners">
+        <div class="container">
+            <div class="banners-grid">
+                <div class="promo-banner">
+                    <div class="promo-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="promo-content">
+                        <h4>100% Free Shipping</h4>
+                        <p>On all orders over $50</p>
+                    </div>
+                </div>
+                <div class="promo-banner">
+                    <div class="promo-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="promo-content">
+                        <h4>24/7 Support</h4>
+                        <p>Dedicated support team</p>
+                    </div>
+                </div>
+                <div class="promo-banner">
+                    <div class="promo-icon">
+                        <i class="fas fa-undo"></i>
+                    </div>
+                    <div class="promo-content">
+                        <h4>30 Day Return</h4>
+                        <p>Money back guarantee</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="product-categories">
+        <div class="container">
+            <div class="section-header">
+                <h2>Product Categories</h2>
+                <p>Browse our wide range of product categories</p>
+            </div>
+            <div class="categories-icons-grid">
+                <a href="shop.html?category=watches" class="category-icon-item">
+                    <div class="category-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <span>Watches</span>
+                </a>
+                <a href="shop.html?category=shoes" class="category-icon-item">
+                    <div class="category-icon">
+                        <i class="fas fa-shoe-prints"></i>
+                    </div>
+                    <span>Shoes</span>
+                </a>
+                <a href="shop.html?category=accessories" class="category-icon-item">
+                    <div class="category-icon">
+                        <i class="fas fa-headphones"></i>
+                    </div>
+                    <span>Accessories</span>
+                </a>
+                <a href="shop.html" class="category-icon-item">
+                    <div class="category-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <span>Electronics</span>
+                </a>
+                <a href="shop.html" class="category-icon-item">
+                    <div class="category-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <span>Cameras</span>
+                </a>
+                <a href="shop.html" class="category-icon-item">
+                    <div class="category-icon">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <span>Computers</span>
+                </a>
+                <a href="shop.html" class="category-icon-item">
+                    <div class="category-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <span>Gaming</span>
+                </a>
+                <a href="shop.html" class="category-icon-item">
+                    <div class="category-icon">
+                        <i class="fas fa-tv"></i>
+                    </div>
+                    <span>TV & Audio</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="categories">
+        <div class="container">
+            <div class="section-header">
+                <h2>Categories of The Month</h2>
+                <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <div class="categories-grid">
+                <div class="category-card">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=500&h=500&fit=crop&q=90" alt="Smartwear">
+                    </div>
+                    <h3>Smartwear Drops</h3>
+                    <a href="shop.html?category=watches" class="btn btn-primary">Explore Tech</a>
+                </div>
+                <div class="category-card">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=500&h=500&fit=crop&q=90" alt="Outdoor Gear">
+                    </div>
+                    <h3>Outdoor Ready</h3>
+                    <a href="shop.html?category=shoes" class="btn btn-primary">Gear Up</a>
+                </div>
+                <div class="category-card">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1507209696998-3c532be9b2b8?w=500&h=500&fit=crop&q=90" alt="Workspace">
+                    </div>
+                    <h3>Workspace Reset</h3>
+                    <a href="shop.html?category=accessories" class="btn btn-primary">Refresh Desk</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="brand-stories community-pulse">
+        <div class="container">
+            <div class="brand-stories-grid">
+                <div class="story-panel">
+                    <div class="story-tag">Community</div>
+                    <h2>Real picks from real people</h2>
+                    <p>Every Sunday we open up the Zay Discord and let shoppers decide what gets restocked, remixed, or retired. Here’s what’s topping the charts this week.</p>
+                    <div class="pulse-cards">
+                        <article class="pulse-card">
+                            <h3>Fast Track</h3>
+                            <p>72-hour reorder cycle on the Smartwear Drop after 18K upvotes.</p>
+                        </article>
+                        <article class="pulse-card">
+                            <h3>Field Tested</h3>
+                            <p>Outdoor Ready kit logged 1,200 trail hours by our beta crew.</p>
+                        </article>
+                    </div>
+                    <a href="contact.html" class="btn btn-secondary">Join the drop crew</a>
+                </div>
+                <div class="pulse-right">
+                    <div class="pulse-metric">
+                        <span class="metric-label">Wishlist Adds</span>
+                        <strong>48,920</strong>
+                        <p>unique products were saved in the last 7 days.</p>
+                    </div>
+                    <ul class="pulse-list">
+                        <li>
+                            <span>Workspace Reset bundles now ship with cable maps crowdsourced from the forum.</span>
+                        </li>
+                        <li>
+                            <span>Community editors curated 6 ready-to-wear looks using only archive items.</span>
+                        </li>
+                        <li>
+                            <span>Members voted to extend carbon-neutral delivery to all limited drops.</span>
+                        </li>
+                    </ul>
+                    <div class="pulse-note">
+                        <p>Want your voice heard? Share a build or review with the hashtag <strong>#zayedit</strong> and we’ll feature our favorites.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="featured-products">
+        <div class="container">
+            <div class="section-header">
+                <h2>Most Popular</h2>
+                <p>Browse our best-selling products across all categories</p>
+            </div>
+            <div class="category-filters">
+                <button class="filter-btn active" onclick="filterProducts('all')">All</button>
+                <button class="filter-btn" onclick="filterProducts('watches')">Watches</button>
+                <button class="filter-btn" onclick="filterProducts('shoes')">Shoes</button>
+                <button class="filter-btn" onclick="filterProducts('accessories')">Accessories</button>
+            </div>
+            <div class="products-grid" id="featuredProducts">
+            </div>
+        </div>
+    </section>
+
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-content">
+                <div class="newsletter-text">
+                    <h2>Get Discount 30% Off</h2>
+                    <p>Subscribe to our newsletter and get special offers and discount codes</p>
+                </div>
+                <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+                    <input type="email" placeholder="Enter your email address" required>
+                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Zay Shop</h3>
+                    <div class="footer-info">
+                        <p><i class="fas fa-map-marker-alt"></i> 123 Consectetur at ligula 10660</p>
+                        <p><i class="fas fa-phone"></i> 010-020-0340</p>
+                        <p><i class="fas fa-envelope"></i> info@company.com</p>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Products</h3>
+                    <ul class="footer-links">
+                        <li><a href="shop.html?category=luxury">Luxury</a></li>
+                        <li><a href="shop.html?category=sport-wear">Sport Wear</a></li>
+                        <li><a href="shop.html?category=men-shoes">Men's Shoes</a></li>
+                        <li><a href="shop.html?category=women-shoes">Women's Shoes</a></li>
+                        <li><a href="shop.html?category=popular-dress">Popular Dress</a></li>
+                        <li><a href="shop.html?category=gym-accessories">Gym Accessories</a></li>
+                        <li><a href="shop.html?category=sport-shoes">Sport Shoes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Further Info</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="shop.html">Shop Locations</a></li>
+                        <li><a href="contact.html">FAQs</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Zay Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="search-modal" id="searchModal">
+        <div class="search-modal-content">
+            <span class="close-search">&times;</span>
+            <input type="text" placeholder="Search products..." id="searchInput">
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+   
+    <div class="floating-widgets">
+  
+        <button class="scroll-to-top" id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+       
+        <div class="floating-cart-widget" id="floatingCart">
+            <div class="floating-cart-header">
+                <h4>Your Cart</h4>
+                <span class="close-floating-cart" onclick="toggleFloatingCart()"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="floating-cart-items" id="floatingCartItems">
+                <p style="text-align: center; padding: 20px; color: var(--text-gray);">Your cart is empty</p>
+            </div>
+            <div class="floating-cart-footer">
+                <div class="floating-cart-total">
+                    <strong>Total: $<span id="floatingCartTotal">0.00</span></strong>
+                </div>
+                <a href="cart.html" class="btn btn-primary" style="width: 100%; margin-top: 15px;">View Cart</a>
+            </div>
+        </div>
+        
+  
+        <button class="floating-cart-toggle" onclick="toggleFloatingCart()">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="floating-cart-count">0</span>
+        </button>
+    </div>
+
+    <script src="js/products.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+

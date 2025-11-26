@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - Zay E-commerce</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html">Zay</a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#" class="search-icon"><i class="fas fa-search"></i></a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="#" class="user-icon"><i class="fas fa-user"></i></a>
+            </div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+
+    <section class="shop-header">
+        <div class="container">
+            <h1>Shopping Cart</h1>
+            <p>Review your items and proceed to checkout</p>
+        </div>
+    </section>
+
+
+    <section class="cart-container">
+        <div class="container">
+           
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="cartItems">
+             
+                </tbody>
+            </table>
+
+            <div class="cart-summary" id="cartSummary">
+            </div>
+        </div>
+    </section>
+
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="checkout-modal-content">
+            <button class="checkout-modal-close" onclick="closeCheckoutModal()">&times;</button>
+            <h3 style="margin-bottom: 10px;">Secure Checkout</h3>
+            <p style="margin-bottom: 20px;">Enter your details to finalize delivery. Your cart total is <strong>$<span id="checkoutDue">0.00</span></strong>.</p>
+            <form id="checkoutForm" onsubmit="handleCheckoutSubmit(event)">
+                <div class="checkout-form-grid">
+                    <div class="form-group">
+                        <label for="checkoutName">Full Name</label>
+                        <input type="text" id="checkoutName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkoutEmail">Email</label>
+                        <input type="email" id="checkoutEmail" required>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="checkoutAddress">Address</label>
+                        <input type="text" id="checkoutAddress" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkoutCity">City</label>
+                        <input type="text" id="checkoutCity" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkoutPostal">Postal Code</label>
+                        <input type="text" id="checkoutPostal" required>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="checkoutCard">Card Number</label>
+                        <input type="text" id="checkoutCard" placeholder="XXXX XXXX XXXX XXXX" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary checkout-btn">Place Order</button>
+            </form>
+            <div class="checkout-confirmation" id="checkoutConfirmation"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Zay Shop</h3>
+                    <div class="footer-info">
+                        <p><i class="fas fa-map-marker-alt"></i> 123 Consectetur at ligula 10660</p>
+                        <p><i class="fas fa-phone"></i> 010-020-0340</p>
+                        <p><i class="fas fa-envelope"></i> info@company.com</p>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Products</h3>
+                    <ul class="footer-links">
+                        <li><a href="shop.html?category=luxury">Luxury</a></li>
+                        <li><a href="shop.html?category=sport-wear">Sport Wear</a></li>
+                        <li><a href="shop.html?category=men-shoes">Men's Shoes</a></li>
+                        <li><a href="shop.html?category=women-shoes">Women's Shoes</a></li>
+                        <li><a href="shop.html?category=popular-dress">Popular Dress</a></li>
+                        <li><a href="shop.html?category=gym-accessories">Gym Accessories</a></li>
+                        <li><a href="shop.html?category=sport-shoes">Sport Shoes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Further Info</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="shop.html">Shop Locations</a></li>
+                        <li><a href="contact.html">FAQs</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Zay Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="search-modal" id="searchModal">
+        <div class="search-modal-content">
+            <span class="close-search">&times;</span>
+            <input type="text" placeholder="Search products..." id="searchInput">
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <div class="floating-widgets">
+        <button class="scroll-to-top" id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+    </div>
+
+    <script src="js/products.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+
