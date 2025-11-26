@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - Zay E-commerce</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+ 
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html">Zay</a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="shop.html" class="active">Shop</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#" class="search-icon"><i class="fas fa-search"></i></a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="#" class="user-icon"><i class="fas fa-user"></i></a>
+            </div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+
+    <section class="shop-header">
+        <div class="container">
+            <p class="eyebrow-text">Fresh arrivals drop weekly</p>
+            <h1>Our most-loved gear</h1>
+            <p>Clean silhouettes, performance fabrics, and everyday staples curated by the Zay team.</p>
+            <div class="shop-header-tags">
+                <span><i class="fas fa-leaf"></i> Carbon neutral packaging</span>
+                <span><i class="fas fa-shipping-fast"></i> Free shipping $50+</span>
+                <span><i class="fas fa-sync"></i> 30-day modern returns</span>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="shop-tools">
+        <div class="container">
+            <div class="shop-toolbar">
+                <div class="filter-group">
+                    <label>Category</label>
+                    <select id="categoryFilter" onchange="filterProducts()">
+                        <option value="">All Categories</option>
+                        <option value="watches">Watches</option>
+                        <option value="shoes">Shoes</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="sortFilter" onchange="sortProducts()">
+                        <option value="default">Default</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="name">Name: A to Z</option>
+                    </select>
+                </div>
+            </div>
+            <div class="shop-pill-filters">
+                <button class="pill-filter active" data-category="">All</button>
+                <button class="pill-filter" data-category="watches">Watches</button>
+                <button class="pill-filter" data-category="shoes">Shoes</button>
+                <button class="pill-filter" data-category="accessories">Accessories</button>
+            </div>
+        </div>
+    </section>
+
+   
+    <section class="shop-highlights">
+        <div class="container">
+            <div class="shop-highlights-grid">
+                <article class="highlight-card">
+                    <span class="highlight-icon"><i class="fas fa-star"></i></span>
+                    <h4>Editor picks</h4>
+                    <p>Rotating capsule collections built around color stories and seasonal textures.</p>
+                </article>
+                <article class="highlight-card">
+                    <span class="highlight-icon"><i class="fas fa-hand-holding-heart"></i></span>
+                    <h4>Made responsibly</h4>
+                    <p>We source from low-impact materials and certify every facility we partner with.</p>
+                </article>
+                <article class="highlight-card">
+                    <span class="highlight-icon"><i class="fas fa-gift"></i></span>
+                    <h4>Member perks</h4>
+                    <p>Earn credit on every purchase and unlock early access to limited drops.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+  
+    <section class="featured-products">
+        <div class="container">
+            <div class="products-grid" id="shopProducts">
+             
+            </div>
+        </div>
+    </section>
+
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Zay Shop</h3>
+                    <div class="footer-info">
+                        <p><i class="fas fa-map-marker-alt"></i> 123 Consectetur at ligula 10660</p>
+                        <p><i class="fas fa-phone"></i> 010-020-0340</p>
+                        <p><i class="fas fa-envelope"></i> info@company.com</p>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Products</h3>
+                    <ul class="footer-links">
+                        <li><a href="shop.html?category=luxury">Luxury</a></li>
+                        <li><a href="shop.html?category=sport-wear">Sport Wear</a></li>
+                        <li><a href="shop.html?category=men-shoes">Men's Shoes</a></li>
+                        <li><a href="shop.html?category=women-shoes">Women's Shoes</a></li>
+                        <li><a href="shop.html?category=popular-dress">Popular Dress</a></li>
+                        <li><a href="shop.html?category=gym-accessories">Gym Accessories</a></li>
+                        <li><a href="shop.html?category=sport-shoes">Sport Shoes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Further Info</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="shop.html">Shop Locations</a></li>
+                        <li><a href="contact.html">FAQs</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Zay Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <div class="search-modal" id="searchModal">
+        <div class="search-modal-content">
+            <span class="close-search">&times;</span>
+            <input type="text" placeholder="Search products..." id="searchInput">
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    
+    <div class="floating-widgets">
+        <button class="scroll-to-top" id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <button class="floating-cart-toggle" onclick="toggleFloatingCart()">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="floating-cart-count">0</span>
+        </button>
+    </div>
+    
+    <div class="floating-cart-widget" id="floatingCart">
+        <div class="floating-cart-header">
+            <h4>Your Cart</h4>
+            <span class="close-floating-cart" onclick="toggleFloatingCart()"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="floating-cart-items" id="floatingCartItems">
+            <p style="text-align: center; padding: 20px; color: var(--text-gray);">Your cart is empty</p>
+        </div>
+        <div class="floating-cart-footer">
+            <div class="floating-cart-total">
+                <strong>Total: $<span id="floatingCartTotal">0.00</span></strong>
+            </div>
+            <a href="cart.html" class="btn btn-primary" style="width: 100%; margin-top: 15px;">View Cart</a>
+        </div>
+    </div>
+
+    <script src="js/products.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function setActiveCategoryPill(category) {
+            const normalized = category || '';
+            document.querySelectorAll('.pill-filter').forEach(btn => {
+                const isActive = (btn.dataset.category || '') === normalized;
+                btn.classList.toggle('active', isActive);
+            });
+        }
+
+        function filterProducts(categoryOverride) {
+            const categorySelect = document.getElementById('categoryFilter');
+            if (categorySelect && typeof categoryOverride !== 'undefined') {
+                categorySelect.value = categoryOverride;
+            }
+            const category = categorySelect ? categorySelect.value : '';
+            setActiveCategoryPill(category);
+            const products = category ? getProductsByCategory(category) : getAllProducts();
+            renderProductsGrid(products, 'shopProducts');
+        }
+
+        function sortProducts() {
+            const sortBy = document.getElementById('sortFilter').value;
+            const category = document.getElementById('categoryFilter').value;
+            let products = category ? getProductsByCategory(category) : getAllProducts();
+            
+            switch(sortBy) {
+                case 'price-low':
+                    products.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    products.sort((a, b) => b.price - a.price);
+                    break;
+                case 'name':
+                    products.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+            }
+            
+            setActiveCategoryPill(category);
+            renderProductsGrid(products, 'shopProducts');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.pill-filter').forEach(button => {
+                button.addEventListener('click', () => {
+                    filterProducts(button.dataset.category || '');
+                });
+            });
+            const currentCategory = document.getElementById('categoryFilter')?.value || '';
+            setActiveCategoryPill(currentCategory);
+        });
+    </script>
+</body>
+</html>
+
