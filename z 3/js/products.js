@@ -256,32 +256,34 @@ const products = [
 ];
 
 function getFeaturedProducts() {
-    return products.slice(0, 6);
+    return getDynamicProducts().slice(0, 6);
 }
 
 function getAllProducts() {
-    return products;
+    return getDynamicProducts();
 }
 
 function getProductById(id) {
-    return products.find(product => product.id === parseInt(id));
+    return getDynamicProducts().find(product => product.id === parseInt(id));
 }
 
 function getProductsByCategory(category) {
-    if (!category) return products;
-    return products.filter(product => product.category === category);
+    const list = getDynamicProducts();
+    if (!category) return list;
+    return list.filter(product => product.category === category);
 }
 
 function searchProducts(query) {
     if (!query) return [];
     const lowerQuery = query.toLowerCase();
-    return products.filter(product => 
+    return getDynamicProducts().filter(product => 
         product.name.toLowerCase().includes(lowerQuery) ||
         product.description.toLowerCase().includes(lowerQuery) ||
         product.category.toLowerCase().includes(lowerQuery)
     );
 }
 
+<<<<<<< Updated upstream
 function renderProductCard(product) {
     const stars = '★'.repeat(product.rating) + '☆'.repeat(5 - product.rating);
     const badge = product.badge ? `<div class="product-badge badge-${product.badge.toLowerCase()}">${product.badge}</div>` : '';
@@ -312,6 +314,117 @@ function renderProductCard(product) {
             </div>
         </div>
     `;
+=======
+function getDynamicProducts() {
+    const combined = [...products];
+    try {
+        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
+        const adminProducts = JSON.parse(localStorage.getItem('adminProducts')) || [];
+        [...storedProducts, ...adminProducts].forEach(p => {
+            if (p && p.id && !combined.find(item => item.id === p.id)) {
+                combined.push(p);
+            }
+        });
+    } catch (e) {
+    }
+    return combined;
+}
+
+function renderProductCard(product) {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.dataset.productId = product.id;
+
+    const media = document.createElement('div');
+    media.className = 'product-media';
+
+    if (product.badge) {
+        const badge = document.createElement('div');
+        badge.className = 'product-badge badge-' + product.badge.toLowerCase();
+        badge.textContent = product.badge;
+        media.appendChild(badge);
+    }
+
+    const img = document.createElement('img');
+    img.src = product.image;
+    img.alt = product.name;
+    img.loading = 'lazy';
+    media.appendChild(img);
+
+    const info = document.createElement('div');
+    info.className = 'product-info';
+
+    const meta = document.createElement('div');
+    meta.className = 'product-meta';
+
+    const category = document.createElement('span');
+    category.className = 'product-category-pill';
+    category.textContent = product.category ? product.category.replace(/^\w/, function(c) { return c.toUpperCase(); }) : 'Featured';
+    meta.appendChild(category);
+
+    const rating = document.createElement('span');
+    rating.className = 'product-rating-badge';
+    rating.innerHTML = makeStars(product.rating) + '<small>' + product.reviews + ' reviews</small>';
+    meta.appendChild(rating);
+
+    info.appendChild(meta);
+
+    const title = document.createElement('h3');
+    title.className = 'product-title';
+    title.textContent = product.name;
+    info.appendChild(title);
+
+    const desc = document.createElement('p');
+    desc.className = 'product-description';
+    desc.textContent = product.description;
+    info.appendChild(desc);
+
+    const priceRow = document.createElement('div');
+    priceRow.className = 'product-price-row';
+
+    const priceStack = document.createElement('div');
+    priceStack.className = 'price-stack';
+
+    const currentPrice = document.createElement('span');
+    currentPrice.className = 'price-current';
+    currentPrice.textContent = '$' + product.price.toFixed(2);
+    priceStack.appendChild(currentPrice);
+
+    if (product.originalPrice) {
+        const original = document.createElement('span');
+        original.className = 'price-original';
+        original.textContent = '$' + product.originalPrice.toFixed(2);
+        priceStack.appendChild(original);
+    }
+
+    priceRow.appendChild(priceStack);
+
+    const delivery = document.createElement('span');
+    delivery.className = 'product-delivery-pill';
+    delivery.textContent = 'Ships in 48h';
+    priceRow.appendChild(delivery);
+
+    info.appendChild(priceRow);
+
+    const button = document.createElement('button');
+    button.className = 'add-to-cart';
+    button.textContent = 'Add to Cart';
+    button.addEventListener('click', function() {
+        addToCart(product.id);
+    });
+    info.appendChild(button);
+
+    card.appendChild(media);
+    card.appendChild(info);
+
+    return card;
+}
+
+function makeStars(rating) {
+    const filled = '★'.repeat(rating);
+    const empty = '☆'.repeat(5 - rating);
+    return filled + empty;
+>>>>>>> Stashed changes
 }
 
 function renderProductsGrid(productsArray, containerId) {
@@ -319,9 +432,28 @@ function renderProductsGrid(productsArray, containerId) {
     if (!container) return;
     
     if (productsArray.length === 0) {
+<<<<<<< Updated upstream
         container.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: var(--text-gray); font-size: 18px; padding: 60px;">No products found. Try a different search or filter.</p>';
         return;
     }
     
     container.innerHTML = productsArray.map(product => renderProductCard(product)).join('');
+=======
+        const empty = document.createElement('p');
+        empty.style.textAlign = 'center';
+        empty.style.gridColumn = '1/-1';
+        empty.style.color = 'var(--text-gray)';
+        empty.style.fontSize = '18px';
+        empty.style.padding = '60px';
+        empty.textContent = 'No products found. Try a different search or filter.';
+        container.innerHTML = '';
+        container.appendChild(empty);
+        return;
+    }
+    
+    container.innerHTML = '';
+    for (let i = 0; i < productsArray.length; i++) {
+        container.appendChild(renderProductCard(productsArray[i]));
+    }
+>>>>>>> Stashed changes
 }

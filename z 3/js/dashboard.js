@@ -1,0 +1,704 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const data = collectDashboardData();
+    renderMetrics(data);
+    renderOrders(data);
+    renderTopProducts(data);
+    renderInventory(data);
+    renderAnalytics(data);
+    renderSettings(data);
+    initProductForm();
+    attachStatusHandlers();
+    initSections();
+});
+
+function collectDashboardData() {
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    let carts = collectCarts();
+    const ordersHistory = getOrders();
+    const settingsPrefs = getSettingsPrefs();
+
+    if (!users.length && !carts.length) {
+        const sample = buildSampleData();
+        users = sample.users;
+        carts = sample.carts;
+    }
+
+    const orderSource = ordersHistory.length ? ordersHistory : carts;
+    const sortedOrders = orderSource.slice().sort(function(a, b) {
+        const aDate = a.date ? new Date(a.date).getTime() : 0;
+        const bDate = b.date ? new Date(b.date).getTime() : 0;
+        return bDate - aDate;
+    });
+
+    const totalRevenue = sortedOrders.reduce(function(sum, cart) {
+        return sum + cart.total;
+    }, 0);
+    const ordersCount = sortedOrders.filter(function(c) { return c.items.length > 0; }).length;
+    const activeUsers = carts.filter(function(c) { return c.items.length > 0 && c.owner; }).length;
+    const avgOrder = ordersCount ? totalRevenue / ordersCount : 0;
+    const activeCartsTotal = carts
+        .filter(function(c) { return c.items.length > 0; })
+        .reduce(function(sum, cart) { return sum + cart.total; }, 0);
+    const orderSalesTotal = ordersHistory.length
+        ? ordersHistory.reduce(function(sum, order) { return sum + (order.total || 0); }, 0)
+        : totalRevenue;
+
+    const productSales = {};
+    carts.forEach(function(cart) {
+        cart.items.forEach(function(item) {
+            if (!productSales[item.id]) {
+                productSales[item.id] = { ...item, sold: 0 };
+            }
+            productSales[item.id].sold += item.quantity;
+        });
+    });
+
+    const topProducts = Object.values(productSales)
+        .sort(function(a, b) { return b.sold - a.sold; })
+        .slice(0, 3);
+
+    const inventory = (getAllProductData()).slice(0, 10).map(function(p, idx) {
+        const stock = Math.max(100 - (idx * 7), 0);
+        let tone = 'success';
+        let status = 'In stock';
+        if (stock < 20) { tone = 'danger'; status = 'Low'; }
+        else if (stock < 50) { tone = 'warn'; status = 'Reorder soon'; }
+        return { name: p.name, sku: 'SKU-' + p.id, status: status, count: stock, tone: tone };
+    });
+
+    const itemsSold = sortedOrders.reduce(function(sum, order) {
+        const itemTotal = (order.items || []).reduce(function(s, i) { return s + (i.quantity || 0); }, 0);
+        return sum + itemTotal;
+    }, 0);
+    const conversionBase = carts.length || sortedOrders.length;
+    const conversionRate = conversionBase ? Math.round((ordersCount / Math.max(conversionBase, 1)) * 100) : 0;
+    const barTotals = sortedOrders.length ? sortedOrders.map(function(o){ return o.total; }) : carts.map(function(c){ return c.total; });
+
+    return {
+        users: users,
+        carts: carts,
+        metrics: [
+            { label: 'Active carts total', value: activeCartsTotal, meta: 'Sum of active carts', trend: { dir: 'up', text: ordersCount + ' orders' }, format: 'currency' },
+            { label: 'Total order sales', value: orderSalesTotal, meta: 'All completed checkouts', trend: ordersCount ? { dir: 'up', text: formatCurrency(avgOrder) + ' avg' } : null, format: 'currency' },
+            { label: 'Total orders', value: ordersCount, meta: 'Orders placed', badge: '' },
+            { label: 'Registered users', value: users.length, meta: 'Accounts created', badge: '' }
+        ],
+        orders: sortedOrders,
+        topProducts: topProducts,
+        inventory: inventory,
+        analytics: {
+            cards: [
+                { label: 'Orders', value: ordersCount.toString(), trend: ordersCount ? 'up' : 'down', change: ordersCount ? '+ live' : 'no orders' },
+                { label: 'Revenue', value: formatCurrency(orderSalesTotal), trend: ordersCount ? 'up' : 'down', change: ordersCount ? formatCurrency(avgOrder) + ' avg' : '$0 avg' },
+                { label: 'Items sold', value: itemsSold.toString(), trend: itemsSold ? 'up' : 'down', change: itemsSold ? '+ items' : 'no items' },
+                { label: 'Conversion', value: conversionBase ? (conversionRate + '%') : '—', trend: conversionRate ? 'up' : 'down', change: conversionBase ? conversionBase + ' sessions' : 'no sessions' }
+            ],
+            bars: buildBarHeights(barTotals),
+            totals: barTotals
+        },
+        settings: mergeSettings(settingsPrefs)
+    };
+}
+
+function collectCarts() {
+    const carts = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('cart_')) {
+            try {
+                const stored = JSON.parse(localStorage.getItem(key)) || [];
+                const ownerKey = key.replace('cart_', '');
+                const owner = ownerKey === 'guest' ? null : decodeURIComponent(ownerKey);
+                const total = stored.reduce(function(sum, item) { return sum + (item.price * item.quantity); }, 0);
+                const date = new Date(parseInt(localStorage.getItem(key + '_updated') || Date.now(), 10));
+                const status = getOrderStatuses()[key] || (stored.length ? 'Pending' : 'Empty');
+                carts.push({ id: key, owner: owner, items: stored, total: total, date: date, status: status });
+            } catch (e) {
+                continue;
+            }
+        }
+    }
+    return carts.sort(function(a, b) { return b.total - a.total; });
+}
+
+function getOrders() {
+    try {
+        const stored = JSON.parse(localStorage.getItem('orders')) || [];
+        return stored.map(function(order) {
+            return {
+                id: order.id,
+                owner: order.owner,
+                items: order.items || [],
+                total: order.total || 0,
+                date: order.date ? new Date(order.date) : new Date(),
+                status: order.status || 'Pending'
+            };
+        });
+    } catch (e) {
+        return [];
+    }
+}
+
+function buildSampleData() {
+    let baseProducts = (typeof products !== 'undefined' ? products.slice(0, 4) : []).map(function(p) {
+        return {
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            image: p.image,
+            category: p.category || 'general',
+            quantity: 1
+        };
+    });
+
+    if (!baseProducts.length) {
+        baseProducts = [
+            { id: 1, name: 'Sample Watch', price: 199, image: '', category: 'watches', quantity: 1 },
+            { id: 2, name: 'Sample Shoes', price: 149, image: '', category: 'shoes', quantity: 1 },
+            { id: 3, name: 'Sample Earbuds', price: 89, image: '', category: 'accessories', quantity: 1 }
+        ];
+    }
+
+    const sampleUsers = [
+        { fullname: 'Alex Morgan', email: 'alex@example.com', role: 'user' },
+        { fullname: 'Jamie Fox', email: 'jamie@example.com', role: 'user' }
+    ];
+
+    const sampleCarts = [
+        { owner: sampleUsers[0].email, items: baseProducts.slice(0, 2), total: sumItems(baseProducts.slice(0, 2)), date: new Date() },
+        { owner: sampleUsers[1].email, items: baseProducts.slice(1, 4), total: sumItems(baseProducts.slice(1, 4)), date: new Date() }
+    ];
+
+    return { users: sampleUsers, carts: sampleCarts };
+}
+
+function sumItems(items) {
+    return items.reduce(function(sum, item) { return sum + (item.price * item.quantity); }, 0);
+}
+
+function renderMetrics(data) {
+    const container = document.getElementById('metricsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    data.metrics.forEach(function(item) {
+        const card = document.createElement('div');
+        card.className = 'dash-card';
+
+        const top = document.createElement('div');
+        top.className = 'card-top';
+
+        const label = document.createElement('p');
+        label.textContent = item.label;
+        top.appendChild(label);
+
+        if (item.trend) {
+            const trend = document.createElement('span');
+            trend.className = 'trend ' + item.trend.dir;
+            trend.innerHTML = '<i class="fa-solid ' + (item.trend.dir === 'up' ? 'fa-arrow-up' : 'fa-arrow-down') + '"></i> ' + item.trend.text;
+            top.appendChild(trend);
+        }
+
+        if (item.badge) {
+            const badge = document.createElement('span');
+            badge.className = 'badge-pill badge-warn';
+            badge.textContent = item.badge;
+            top.appendChild(badge);
+        }
+
+        card.appendChild(top);
+
+        const value = document.createElement('h2');
+        const isCurrency = item.format === 'currency';
+        value.textContent = typeof item.value === 'number' && isCurrency ? formatCurrency(item.value) : item.value;
+        card.appendChild(value);
+
+        const meta = document.createElement('p');
+        meta.className = 'muted';
+        meta.textContent = item.meta;
+        card.appendChild(meta);
+
+        container.appendChild(card);
+    });
+}
+
+function renderOrders(data) {
+    const body = document.getElementById('ordersBody');
+    const cards = document.getElementById('ordersCards');
+    if (!body) return;
+    body.innerHTML = '';
+    if (cards) cards.innerHTML = '';
+    if (data.orders.length === 0) {
+        const empty = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 5;
+        td.textContent = 'No carts yet.';
+        empty.appendChild(td);
+        body.appendChild(empty);
+        if (cards) {
+            const emptyCard = document.createElement('div');
+            emptyCard.className = 'order-card empty';
+            emptyCard.textContent = 'No orders yet.';
+            cards.appendChild(emptyCard);
+        }
+        return;
+    }
+    data.orders.forEach(function(order) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${formatOrderId(order.id)}</td>
+            <td>${order.owner || 'Guest'}</td>
+            <td>
+                <select class="order-status" data-order="${order.id}">
+                    ${['Pending','Processing','Shipped','Completed','Cancelled'].map(function(st){
+                        const statusValue = (getOrderStatuses()[order.id] || order.status || 'Pending');
+                        const selected = statusValue === st ? 'selected' : '';
+                        return '<option '+selected+'>'+st+'</option>';
+                    }).join('')}
+                </select>
+            </td>
+            <td>${formatCurrency(order.total)}</td>
+            <td>${order.date.toLocaleDateString()}</td>
+        `;
+        body.appendChild(row);
+
+        if (cards) {
+            const card = document.createElement('div');
+            card.className = 'order-card';
+
+            const top = document.createElement('div');
+            top.className = 'order-card__row';
+            top.innerHTML = `<strong>${formatOrderId(order.id)}</strong><span class="pill">${order.status || 'Pending'}</span>`;
+
+            const middle = document.createElement('div');
+            middle.className = 'order-card__row muted';
+            middle.innerHTML = `<span>${order.owner || 'Guest'}</span><span>${order.date.toLocaleDateString()}</span>`;
+
+            const bottom = document.createElement('div');
+            bottom.className = 'order-card__row';
+            bottom.innerHTML = `<span>Total</span><strong>${formatCurrency(order.total)}</strong>`;
+
+            const statusWrap = document.createElement('div');
+            statusWrap.className = 'order-card__row';
+            const label = document.createElement('span');
+            label.textContent = 'Status';
+            const select = document.createElement('select');
+            select.className = 'order-status';
+            select.setAttribute('data-order', order.id);
+            const statusValue = (getOrderStatuses()[order.id] || order.status || 'Pending');
+            ['Pending','Processing','Shipped','Completed','Cancelled'].forEach(function(st) {
+                const opt = document.createElement('option');
+                opt.value = st;
+                opt.textContent = st;
+                if (statusValue === st) opt.selected = true;
+                select.appendChild(opt);
+            });
+            statusWrap.appendChild(label);
+            statusWrap.appendChild(select);
+
+            card.appendChild(top);
+            card.appendChild(middle);
+            card.appendChild(bottom);
+            card.appendChild(statusWrap);
+            cards.appendChild(card);
+        }
+    });
+}
+
+function renderTopProducts(data) {
+    const list = document.getElementById('topProductsList');
+    if (!list) return;
+    list.innerHTML = '';
+    if (data.topProducts.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No product activity yet.';
+        list.appendChild(li);
+        return;
+    }
+    data.topProducts.forEach(function(item) {
+        const li = document.createElement('li');
+        const left = document.createElement('div');
+        const title = document.createElement('strong');
+        title.textContent = item.name;
+        const meta = document.createElement('p');
+        meta.className = 'muted';
+        meta.textContent = (item.category || 'Products') + ' • ' + item.sold + ' in carts';
+        left.appendChild(title);
+        left.appendChild(meta);
+
+        const pill = document.createElement('span');
+        pill.className = 'pill' + (item.tone ? ' pill-' + item.tone : '');
+        pill.textContent = formatCurrency(item.price);
+
+        li.appendChild(left);
+        li.appendChild(pill);
+        list.appendChild(li);
+    });
+}
+
+function renderInventory(data) {
+    const list = document.getElementById('inventoryList');
+    if (!list) return;
+    list.innerHTML = '';
+    data.inventory.forEach(function(item) {
+        const li = document.createElement('li');
+        const left = document.createElement('div');
+        const name = document.createElement('p');
+        name.innerHTML = '<strong>' + item.name + '</strong>';
+        const sku = document.createElement('p');
+        sku.className = 'muted';
+        sku.textContent = 'SKU: ' + item.sku;
+        left.appendChild(name);
+        left.appendChild(sku);
+
+        const status = document.createElement('span');
+        status.className = 'status-pill ' + item.tone;
+        status.textContent = item.status + ' • ' + item.count;
+
+        li.appendChild(left);
+        li.appendChild(status);
+        list.appendChild(li);
+    });
+}
+
+function renderCustomers(data) {
+    return;
+}
+
+function renderAnalytics(data) {
+    const cards = document.getElementById('analyticsCards');
+    const bars = document.getElementById('chartBars');
+    const label = document.getElementById('chartLabel');
+    const meta = document.getElementById('chartMeta');
+    const pill = document.getElementById('analyticsPill');
+    if (cards) {
+        cards.innerHTML = '';
+        data.analytics.cards.forEach(function(item) {
+            const card = document.createElement('div');
+            card.className = 'analytics-card';
+            const label = document.createElement('p');
+            label.className = 'muted';
+            label.textContent = item.label;
+            const value = document.createElement('h3');
+            value.textContent = item.value;
+            const trend = document.createElement('p');
+            trend.className = 'trend ' + item.trend;
+            trend.innerHTML = '<i class="fa-solid ' + (item.trend === 'up' ? 'fa-arrow-up' : 'fa-arrow-down') + '"></i> ' + item.change;
+            card.appendChild(label);
+            card.appendChild(value);
+            card.appendChild(trend);
+            cards.appendChild(card);
+        });
+    }
+    if (bars) {
+        bars.innerHTML = '';
+        const barValues = (data.analytics.totals || []).slice(0, 6);
+        const heights = data.analytics.bars.slice(0, barValues.length || data.analytics.bars.length);
+        heights.forEach(function(val, idx) {
+            const bar = document.createElement('span');
+            bar.style.height = val + '%';
+            const amount = barValues[idx] !== undefined ? barValues[idx] : 0;
+            bar.setAttribute('data-value', formatCurrency(amount));
+            bars.appendChild(bar);
+        });
+    }
+
+    if (label) {
+        const count = data.analytics.totals ? Math.min(data.analytics.totals.length, 6) : 6;
+        label.textContent = 'Order totals (last ' + count + ')';
+    }
+
+    if (meta) {
+        const totals = data.analytics.totals || [];
+        if (totals.length) {
+            const max = Math.max.apply(null, totals);
+            const avg = totals.reduce(function(sum, v){ return sum + v; }, 0) / totals.length;
+            meta.textContent = 'Peak ' + formatCurrency(max) + ' • Avg ' + formatCurrency(avg);
+        } else {
+            meta.textContent = 'No order history yet.';
+        }
+    }
+
+    if (pill) {
+        pill.textContent = data.orders && data.orders.length ? 'Live' : 'No data';
+    }
+}
+
+function renderSettings(data) {
+    const list = document.getElementById('settingsList');
+    if (!list) return;
+    list.innerHTML = '';
+    data.settings.forEach(function(item) {
+        const label = document.createElement('label');
+        label.className = 'setting-row';
+
+        const info = document.createElement('div');
+        const title = document.createElement('strong');
+        title.textContent = item.label;
+        const desc = document.createElement('p');
+        desc.className = 'muted';
+        desc.textContent = item.desc;
+        info.appendChild(title);
+        info.appendChild(desc);
+
+        const toggle = document.createElement('input');
+        toggle.type = 'checkbox';
+        toggle.checked = !!item.checked;
+        toggle.addEventListener('change', function() {
+            persistSetting(item.label, toggle.checked);
+        });
+
+        label.appendChild(info);
+        label.appendChild(toggle);
+        list.appendChild(label);
+    });
+}
+
+function statusTone(status) {
+    const text = status.toLowerCase();
+    if (text.includes('ship')) return 'success';
+    if (text.includes('process')) return 'warn';
+    return 'danger';
+}
+
+function formatCurrency(amount) {
+    if (typeof amount !== 'number') return amount;
+    return '$' + amount.toFixed(2);
+}
+
+function formatOrderId(id) {
+    if (!id) return '#';
+    if (id.startsWith('cart_')) return '#' + id.replace('cart_', '');
+    if (id.startsWith('order_')) return '#' + id.replace('order_', '');
+    return '#' + id;
+}
+
+function buildBarHeights(totals) {
+    if (!totals || !totals.length) return [10, 12, 8, 6, 9, 7];
+    const max = Math.max.apply(null, totals);
+    return totals.slice(0, 6).map(function(val) {
+        return max ? Math.round((val / max) * 90) + 10 : 10;
+    });
+}
+
+function getOrderStatuses() {
+    try {
+        return JSON.parse(localStorage.getItem('orderStatuses')) || {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function saveOrderStatuses(map) {
+    localStorage.setItem('orderStatuses', JSON.stringify(map));
+}
+
+function saveOrders(list) {
+    localStorage.setItem('orders', JSON.stringify(list));
+}
+
+function attachStatusHandlers() {
+    const body = document.getElementById('ordersBody');
+    if (!body) return;
+    body.addEventListener('change', function(e) {
+        if (e.target && e.target.classList.contains('order-status')) {
+            const id = e.target.getAttribute('data-order');
+            const statuses = getOrderStatuses();
+            statuses[id] = e.target.value;
+            saveOrderStatuses(statuses);
+
+            const stored = getOrders();
+            const updated = stored.map(function(o) {
+                if (o.id === id) {
+                    return { ...o, status: e.target.value };
+                }
+                return o;
+            });
+            saveOrders(updated);
+        }
+    });
+}
+
+function mergeSettings(stored) {
+    const defaults = [
+        { label: 'Maintenance mode', desc: 'Temporarily pause storefront', checked: false },
+        { label: 'Low stock alerts', desc: 'Email when inventory < 10', checked: true },
+        { label: 'Order notifications', desc: 'Push updates to admin email', checked: true }
+    ];
+    return defaults.map(function(item) {
+        if (stored[item.label] !== undefined) {
+            return { ...item, checked: stored[item.label] };
+        }
+        return item;
+    });
+}
+
+function getSettingsPrefs() {
+    try {
+        return JSON.parse(localStorage.getItem('settingsPrefs')) || {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function persistSetting(label, value) {
+    const prefs = getSettingsPrefs();
+    prefs[label] = value;
+    localStorage.setItem('settingsPrefs', JSON.stringify(prefs));
+}
+
+function getAllProductData() {
+    const base = typeof products !== 'undefined' ? products : [];
+    const adminProducts = getAdminProducts();
+    return base.concat(adminProducts);
+}
+
+function getAdminProducts() {
+    try {
+        return JSON.parse(localStorage.getItem('adminProducts')) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveAdminProducts(list) {
+    localStorage.setItem('adminProducts', JSON.stringify(list));
+}
+
+function populateCategorySelect(selectEl) {
+    if (!selectEl) return;
+    const categories = getUniqueCategories();
+    selectEl.innerHTML = '<option value="" disabled selected>Select category</option>';
+    categories.forEach(function(cat) {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = formatCategory(cat);
+        selectEl.appendChild(opt);
+    });
+}
+
+function getUniqueCategories() {
+    const all = getAllProductData();
+    const set = new Set();
+    all.forEach(function(p) {
+        if (p.category) set.add(p.category);
+    });
+    return Array.from(set);
+}
+
+function formatCategory(cat) {
+    if (!cat) return '';
+    return cat.charAt(0).toUpperCase() + cat.slice(1);
+}
+
+function initProductForm() {
+    const form = document.getElementById('productForm');
+    const categorySelect = document.getElementById('productCategory');
+    if (!form) return;
+    populateCategorySelect(categorySelect);
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('productName').value.trim();
+        const price = parseFloat(document.getElementById('productPrice').value);
+        const category = document.getElementById('productCategory').value.trim();
+        const image = document.getElementById('productImage').value.trim();
+        const description = (document.getElementById('productDescription')?.value || '').trim();
+        if (!name || isNaN(price) || !category || !image || !description) return;
+
+        const adminList = getAdminProducts();
+        const newProduct = {
+            id: Date.now(),
+            name: name,
+            price: price,
+            category: category,
+            image: image,
+            description: description,
+            rating: 4,
+            reviews: 0
+        };
+        adminList.push(newProduct);
+        saveAdminProducts(adminList);
+        persistProductsArray(newProduct);
+        form.reset();
+        populateCategorySelect(categorySelect);
+
+        const data = collectDashboardData();
+        renderTopProducts(data);
+        renderInventory(data);
+        renderAdminProducts(adminList);
+    });
+
+    renderAdminProducts(getAdminProducts());
+}
+
+function renderAdminProducts(list) {
+    const wrapper = document.getElementById('adminProductsList');
+    if (!wrapper) return;
+    wrapper.innerHTML = '';
+    if (!list.length) {
+        wrapper.textContent = 'No admin products yet.';
+        return;
+    }
+    list.forEach(function(p) {
+        const row = document.createElement('div');
+        row.className = 'product-row';
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.innerHTML = `<strong>${p.name}</strong><span class="muted">${p.category} • $${p.price}</span><span class="muted">${p.description || ''}</span>`;
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', function() {
+            const filtered = getAdminProducts().filter(function(item) { return item.id !== p.id; });
+            saveAdminProducts(filtered);
+            renderAdminProducts(filtered);
+            const data = collectDashboardData();
+            renderTopProducts(data);
+            renderInventory(data);
+        });
+        actions.appendChild(removeBtn);
+        row.appendChild(meta);
+        row.appendChild(actions);
+        wrapper.appendChild(row);
+    });
+}
+
+function persistProductsArray(newProduct) {
+    const key = 'products';
+    try {
+        const existing = JSON.parse(localStorage.getItem(key)) || [];
+        existing.push(newProduct);
+        localStorage.setItem(key, JSON.stringify(existing));
+    } catch (e) {
+        localStorage.setItem(key, JSON.stringify([newProduct]));
+    }
+}
+
+function initSections() {
+    const navLinks = document.querySelectorAll('.dash-nav a');
+    const sections = document.querySelectorAll('.dash-section');
+
+    function showSection(name) {
+        navLinks.forEach(function(link) {
+            link.classList.toggle('active', link.getAttribute('data-section') === name);
+        });
+        sections.forEach(function(sec) {
+            const match = sec.getAttribute('data-section') === name;
+            if (match) {
+                sec.classList.remove('hidden');
+            } else {
+                sec.classList.add('hidden');
+            }
+        });
+    }
+
+    navLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const name = this.getAttribute('data-section');
+            if (name) showSection(name);
+        });
+    });
+
+    showSection('overview');
+}

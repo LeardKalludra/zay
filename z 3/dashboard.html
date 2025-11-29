@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Zay</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="dash-sidebar">
+            <div class="dash-brand">
+                <a href="index.html">Zay</a>
+                <span>Admin</span>
+            </div>
+            <nav class="dash-nav">
+                <a class="active" data-section="overview"><i class="fa-solid fa-gauge"></i> Overview</a>
+                <a data-section="products"><i class="fa-solid fa-box"></i> Products</a>
+                <a data-section="orders"><i class="fa-solid fa-cart-shopping"></i> Orders</a>
+                <a data-section="analytics"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+                <a data-section="settings"><i class="fa-solid fa-gear"></i> Settings</a>
+            </nav>
+            <button class="dash-logout" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </aside>
+
+        <main class="dash-main">
+            <header class="dash-header">
+                <div>
+                    <p class="eyebrow-text">Control center</p>
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="dash-badges">
+                    <button class="dash-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+                    <span class="badge-pill badge-live">Live</span>
+                    <span class="badge-pill">v1.0</span>
+                </div>
+            </header>
+
+            <section class="dash-cards dash-section active" id="metricsContainer" data-section="overview"></section>
+
+            <section class="dash-grid">
+                <div class="dash-panel dash-section" data-section="orders">
+                    <div class="panel-head">
+                        <h3>Recent Orders</h3>
+                    </div>
+                    <table class="dash-table">
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersBody"></tbody>
+                    </table>
+                    <div class="orders-cards" id="ordersCards"></div>
+                </div>
+
+                <div class="dash-panel dash-section" data-section="products">
+                    <div class="panel-head">
+                        <h3>Top Products</h3>
+                    </div>
+                    <ul class="list-cards" id="topProductsList"></ul>
+                    <div class="dash-divider"></div>
+                    <div class="panel-head">
+                        <h3>Add Product</h3>
+                        <span class="pill">Admin-only</span>
+                    </div>
+                    <form id="productForm" class="product-form">
+                        <div class="form-row">
+                            <input type="text" id="productName" placeholder="Name" required>
+                            <input type="number" id="productPrice" placeholder="Price" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-row">
+                            <select id="productCategory" required>
+                                <option value="" disabled selected>Select category</option>
+                            </select>
+                            <input type="url" id="productImage" placeholder="Image URL" required>
+                        </div>
+                        <div class="form-row">
+                            <textarea id="productDescription" placeholder="Description" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create product</button>
+                    </form>
+                    <div id="adminProductsList" class="product-list"></div>
+                </div>
+            </section>
+
+            <section class="dash-grid">
+                <div class="dash-panel dash-section" data-section="products">
+                    <div class="panel-head">
+                        <h3>Inventory</h3>
+                        <a href="#" class="link-muted">Manage</a>
+                    </div>
+                    <ul class="inventory-list" id="inventoryList"></ul>
+                </div>
+            </section>
+
+            <section class="dash-grid">
+                <div class="dash-panel dash-section" data-section="analytics">
+                    <div class="panel-head">
+                        <h3 id="analyticsTitle">Traffic & Conversion</h3>
+                        <span class="pill" id="analyticsPill">Live</span>
+                    </div>
+                    <div class="analytics-cards" id="analyticsCards"></div>
+                    <div class="analytics-chart-placeholder">
+                        <p id="chartLabel">Orders trend</p>
+                        <div class="chart-bars" id="chartBars"></div>
+                        <div class="chart-meta" id="chartMeta"></div>
+                    </div>
+                </div>
+                <div class="dash-panel dash-section" data-section="settings">
+                    <div class="panel-head">
+                        <h3>Quick Settings</h3>
+                        <span class="pill pill-pink">Admin</span>
+                    </div>
+                    <div class="settings-list" id="settingsList"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script>
+        const user = getAuthenticatedUser();
+        if (!user || user.role !== 'admin') {
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            logout();
+        });
+
+        const navLinks = document.querySelectorAll('.dash-nav a');
+        const shell = document.querySelector('.dashboard-shell');
+        const toggleBtn = document.getElementById('sidebarToggle');
+
+        navLinks.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if (targetId && targetId.startsWith('#')) {
+                    e.preventDefault();
+                    document.querySelector(targetId)?.scrollIntoView({ behavior: 'smooth' });
+                    navLinks.forEach(function(l) { l.classList.remove('active'); });
+                    this.classList.add('active');
+                }
+                if (window.innerWidth <= 900 && shell) {
+                    shell.classList.remove('sidebar-open');
+                }
+            });
+        });
+
+        if (toggleBtn && shell) {
+            toggleBtn.addEventListener('click', function() {
+                shell.classList.toggle('sidebar-open');
+            });
+        }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 900 && shell) {
+                shell.classList.remove('sidebar-open');
+            }
+        });
+    </script>
+</body>
+</html>

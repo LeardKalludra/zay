@@ -78,6 +78,7 @@ form.addEventListener("submit",(e) => {
             fullname: fullname.value,
             email: email.value,
             password: password.value,
+            role:"user"
     })
     window.location.href = "login.html"
 

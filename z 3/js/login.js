@@ -3,6 +3,9 @@ const loginEmail = document.getElementById("loginEmail");
 const loginPassword = document.getElementById("loginPassword");
 const remember = document.querySelector("input[name='remember']");
 
+const adminEmail = "admin@zayshop.com";
+const adminPassword = "Admin123!";
+
 const users = JSON.parse(localStorage.getItem("users")) || [];
 
 const user = getAuthenticatedUser();
@@ -58,14 +61,37 @@ loginForm.addEventListener("submit", (e) => {
 
     if (!valid) return;
 
-    const user = users.find((u) => u.email === loginEmail.value.trim());
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value.trim();
+
+    if (email === adminEmail) {
+        if (password !== adminPassword) {
+            showError(loginPassword, "Incorrect password.");
+            return;
+        }
+
+        const adminUser = {
+            fullname: "Admin",
+            email: adminEmail,
+            role: "admin",
+        };
+        if (remember.checked) {
+            localStorage.setItem("loggedInUser", JSON.stringify(adminUser));
+        } else {
+            sessionStorage.setItem("loggedInUser", JSON.stringify(adminUser));
+        }
+        window.location.href = "dashboard.html";
+        return;
+    }
+
+    const user = users.find((u) => u.email === email);
 
     if (!user) {
         showError(loginEmail, "No account found with that email.");
         return;
     }
 
-    if (user.password !== loginPassword.value.trim()) {
+    if (user.password !== password) {
         showError(loginPassword, "Incorrect password.");
         return;
     }
