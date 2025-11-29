@@ -139,6 +139,116 @@ body {
     transform: scale(1.1);
 }
 
+.user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.user-menu::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 12px;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 10px;
+    min-width: 160px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1001;
+}
+
+.login-link i,.signup-link i {
+    margin-right: 10px;
+}
+
+.user-menu:hover .user-dropdown,
+.user-menu:focus-within .user-dropdown {
+    display: flex;
+}
+
+.user-dropdown a {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 16px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.user-dropdown a:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
+}
+
+.user-auth {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.user-guest {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.user-name {
+    font-weight: 700;
+    color: var(--text-dark);
+    font-size: 15px;
+}
+
+.user-meta-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-gray);
+}
+
+.user-email {
+    font-size: 13px;
+    color: var(--text-gray);
+}
+
+.logout-btn {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-white);
+    font-weight: 700;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: var(--primary-color);
+    color: var(--bg-white);
+    border-color: var(--primary-color);
+}
+
+.user-menu.is-auth .user-auth {
+    display: flex;
+}
+
+.user-menu.is-auth .user-guest {
+    display: none;
+}
+
 .hamburger {
     display: none;
     flex-direction: column;

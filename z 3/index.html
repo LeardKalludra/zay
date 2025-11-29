@@ -31,7 +31,21 @@
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count">0</span>
                 </a>
-                <a href="#" class="user-icon"><i class="fas fa-user"></i></a>
+                <div class="user-menu">
+                    <a href="#" class="user-icon"><i class="fas fa-user"></i></a>
+                    <div class="user-dropdown">
+                        <div class="user-auth">
+                            <span class="user-meta-label">Signed in</span>
+                            <span class="user-name"></span>
+                            <span class="user-email"></span>
+                            <button type="button" class="logout-btn">Logout</button>
+                        </div>
+                        <div class="user-guest">
+                            <a href="login.html" class="login-link"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+                            <a href="signup.html" class="signup-link"><i class="fa-solid fa-user-plus"></i> Sign Up</a>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="hamburger">
                 <span></span>
@@ -371,6 +385,7 @@
 
     <script src="js/products.js"></script>
     <script src="js/cart.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

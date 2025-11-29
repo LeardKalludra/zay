@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initScrollToTop();
     
     initFloatingCart();
+    initUserMenu();
 });
 
 function initScrollAnimations() {
@@ -106,7 +107,38 @@ function updateFloatingCart() {
     }
 }
 
-    function initHeroSlider() {
+function initUserMenu() {
+    const userMenu = document.querySelector('.user-menu');
+    const userDropdown = userMenu ? userMenu.querySelector('.user-dropdown') : null;
+    if (!userMenu || !userDropdown || typeof getAuthenticatedUser !== 'function') return;
+
+    const user = getAuthenticatedUser();
+    const userNameEl = userDropdown.querySelector('.user-name');
+    const userEmailEl = userDropdown.querySelector('.user-email');
+    const logoutBtn = userDropdown.querySelector('.logout-btn');
+
+    if (user) {
+        if (userNameEl) {
+            userNameEl.textContent = user.fullname || user.email || 'Account';
+        }
+        if (userEmailEl) {
+            userEmailEl.textContent = user.email || '';
+            userEmailEl.style.display = user.email ? 'block' : 'none';
+        }
+        userMenu.classList.add('is-auth');
+    } else {
+        userMenu.classList.remove('is-auth');
+    }
+
+    if (logoutBtn && typeof logout === 'function') {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            logout();
+        });
+    }
+}
+
+function initHeroSlider() {
     const slides = document.querySelectorAll('.hero-slide');
     const indicators = document.querySelectorAll('.indicator');
     const prevBtn = document.querySelector('.hero-prev');

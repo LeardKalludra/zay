@@ -1,8 +1,31 @@
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+function getActiveUser() {
+    if (typeof getAuthenticatedUser === 'function') {
+        return getAuthenticatedUser();
+    }
+    try {
+        const localUser = localStorage.getItem('loggedInUser');
+        if (localUser) return JSON.parse(localUser);
+        const sessionUser = sessionStorage.getItem('loggedInUser');
+        if (sessionUser) return JSON.parse(sessionUser);
+    } catch (err) {
+        return null;
+    }
+    return null;
+}
+
+function getCartStorageKey() {
+    const user = getActiveUser();
+    if (user && user.email) {
+        return `cart_${encodeURIComponent(user.email)}`;
+    }
+    return 'cart_guest';
+}
+
+let cart = JSON.parse(localStorage.getItem(getCartStorageKey())) || [];
 
 function syncCartFromStorage() {
     try {
-        const storedCart = JSON.parse(localStorage.getItem('cart'));
+        const storedCart = JSON.parse(localStorage.getItem(getCartStorageKey()));
         cart = Array.isArray(storedCart) ? storedCart : [];
     } catch (error) {
         cart = [];
@@ -19,6 +42,12 @@ function updateCartCount() {
 
 
 function addToCart(productId) {
+    const user = getActiveUser();
+    if (!user) {
+        showNotification('Please log in to add items to your cart.');
+        return;
+    }
+
     syncCartFromStorage();
     const product = getProductById(productId);
     if (!product) return;
@@ -87,7 +116,7 @@ function getCartTotal() {
 }
 
 function saveCart() {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem(getCartStorageKey(), JSON.stringify(cart));
 }
 
 function renderCart() {
