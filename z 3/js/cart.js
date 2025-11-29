@@ -127,87 +127,156 @@ function renderCart() {
     if (!cartContainer) return;
     
     if (cart.length === 0) {
-        cartContainer.innerHTML = `
-            <tr>
-                <td colspan="5" style="text-align: center; padding: 40px;">
-                    <p style="font-size: 18px; color: #999;">Your cart is empty</p>
-                    <a href="shop.html" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">Continue Shopping</a>
-                </td>
-            </tr>
-        `;
+        cartContainer.innerHTML = '';
+        const emptyRow = document.createElement('tr');
+        const emptyTd = document.createElement('td');
+        emptyTd.colSpan = 5;
+        emptyTd.style.textAlign = 'center';
+        emptyTd.style.padding = '40px';
+
+        const emptyMsg = document.createElement('p');
+        emptyMsg.style.fontSize = '18px';
+        emptyMsg.style.color = '#999';
+        emptyMsg.textContent = 'Your cart is empty';
+
+        const shopLink = document.createElement('a');
+        shopLink.href = 'shop.html';
+        shopLink.className = 'btn btn-primary';
+        shopLink.style.marginTop = '20px';
+        shopLink.style.display = 'inline-block';
+        shopLink.textContent = 'Continue Shopping';
+
+        emptyTd.appendChild(emptyMsg);
+        emptyTd.appendChild(shopLink);
+        emptyRow.appendChild(emptyTd);
+        cartContainer.appendChild(emptyRow);
         
         if (cartSummary) {
-            cartSummary.innerHTML = `
-                <div class="summary-row">
-                    <span>Subtotal:</span>
-                    <span>$0.00</span>
-                </div>
-                <div class="summary-row">
-                    <span>Shipping:</span>
-                    <span>$0.00</span>
-                </div>
-                <div class="summary-row total">
-                    <span>Total:</span>
-                    <span>$0.00</span>
-                </div>
-            `;
+            cartSummary.innerHTML = '';
+            cartSummary.appendChild(makeSummaryRow('Subtotal:', '$0.00'));
+            cartSummary.appendChild(makeSummaryRow('Shipping:', '$0.00'));
+            cartSummary.appendChild(makeSummaryRow('Total:', '$0.00', true));
         }
         return;
     }
-    
-    cartContainer.innerHTML = cart.map(item => {
+
+    cartContainer.innerHTML = '';
+    for (let i = 0; i < cart.length; i++) {
+        const item = cart[i];
         const lineTotal = (item.price * item.quantity).toFixed(2);
-        return `
-        <tr>
-            <td>
-                <div class="cart-item-details">
-                    <img src="${item.image}" alt="${item.name}" class="cart-item-image" loading="lazy">
-                    <div>
-                        <p class="cart-item-name">${item.name}</p>
-                        <span class="cart-item-meta">Saved locally for a faster checkout.</span>
-                    </div>
-                </div>
-            </td>
-            <td>$${item.price.toFixed(2)}</td>
-            <td>
-                <div class="quantity-control">
-                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
-                    <input type="number" class="quantity-input" value="${item.quantity}" 
-                           onchange="updateQuantity(${item.id}, this.value)" min="1">
-                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
-                </div>
-            </td>
-            <td>$${lineTotal}</td>
-            <td>
-                <span class="remove-item" onclick="removeFromCart(${item.id})" title="Remove">
-                    <i class="fas fa-trash"></i>
-                </span>
-            </td>
-        </tr>
-    `;
-    }).join('');
+
+        const row = document.createElement('tr');
+
+        const itemTd = document.createElement('td');
+        const itemDetails = document.createElement('div');
+        itemDetails.className = 'cart-item-details';
+
+        const itemImg = document.createElement('img');
+        itemImg.src = item.image;
+        itemImg.alt = item.name;
+        itemImg.className = 'cart-item-image';
+        itemImg.loading = 'lazy';
+
+        const itemInfo = document.createElement('div');
+        const itemName = document.createElement('p');
+        itemName.className = 'cart-item-name';
+        itemName.textContent = item.name;
+        const itemMeta = document.createElement('span');
+        itemMeta.className = 'cart-item-meta';
+        itemMeta.textContent = 'Saved locally for a faster checkout.';
+
+        itemInfo.appendChild(itemName);
+        itemInfo.appendChild(itemMeta);
+        itemDetails.appendChild(itemImg);
+        itemDetails.appendChild(itemInfo);
+        itemTd.appendChild(itemDetails);
+        row.appendChild(itemTd);
+
+        const priceTd = document.createElement('td');
+        priceTd.textContent = '$' + item.price.toFixed(2);
+        row.appendChild(priceTd);
+
+        const qtyTd = document.createElement('td');
+        const qtyControl = document.createElement('div');
+        qtyControl.className = 'quantity-control';
+
+        const minusBtn = document.createElement('button');
+        minusBtn.className = 'quantity-btn';
+        minusBtn.textContent = '-';
+        minusBtn.addEventListener('click', function() {
+            updateQuantity(item.id, item.quantity - 1);
+        });
+
+        const qtyInput = document.createElement('input');
+        qtyInput.type = 'number';
+        qtyInput.className = 'quantity-input';
+        qtyInput.value = item.quantity;
+        qtyInput.min = 1;
+        qtyInput.addEventListener('change', function() {
+            updateQuantity(item.id, this.value);
+        });
+
+        const plusBtn = document.createElement('button');
+        plusBtn.className = 'quantity-btn';
+        plusBtn.textContent = '+';
+        plusBtn.addEventListener('click', function() {
+            updateQuantity(item.id, item.quantity + 1);
+        });
+
+        qtyControl.appendChild(minusBtn);
+        qtyControl.appendChild(qtyInput);
+        qtyControl.appendChild(plusBtn);
+        qtyTd.appendChild(qtyControl);
+        row.appendChild(qtyTd);
+
+        const lineTd = document.createElement('td');
+        lineTd.textContent = '$' + lineTotal;
+        row.appendChild(lineTd);
+
+        const removeTd = document.createElement('td');
+        const removeSpan = document.createElement('span');
+        removeSpan.className = 'remove-item';
+        removeSpan.title = 'Remove';
+        removeSpan.innerHTML = '<i class="fas fa-trash"></i>';
+        removeSpan.addEventListener('click', function() {
+            removeFromCart(item.id);
+        });
+        removeTd.appendChild(removeSpan);
+        row.appendChild(removeTd);
+
+        cartContainer.appendChild(row);
+    }
     
     if (cartSummary) {
         const subtotal = getCartTotal();
         const shipping = subtotal > 0 ? 10.00 : 0;
         const total = subtotal + shipping;
         
-        cartSummary.innerHTML = `
-            <div class="summary-row">
-                <span>Subtotal:</span>
-                <span>$${subtotal.toFixed(2)}</span>
-            </div>
-            <div class="summary-row">
-                <span>Shipping:</span>
-                <span>$${shipping.toFixed(2)}</span>
-            </div>
-            <div class="summary-row total">
-                <span>Total:</span>
-                <span>$${total.toFixed(2)}</span>
-            </div>
-            <button class="btn btn-primary checkout-btn" onclick="checkout()">Proceed to Checkout</button>
-        `;
+        cartSummary.innerHTML = '';
+        cartSummary.appendChild(makeSummaryRow('Subtotal:', '$' + subtotal.toFixed(2)));
+        cartSummary.appendChild(makeSummaryRow('Shipping:', '$' + shipping.toFixed(2)));
+        cartSummary.appendChild(makeSummaryRow('Total:', '$' + total.toFixed(2), true));
+
+        const checkoutBtn = document.createElement('button');
+        checkoutBtn.className = 'btn btn-primary checkout-btn';
+        checkoutBtn.textContent = 'Proceed to Checkout';
+        checkoutBtn.addEventListener('click', checkout);
+        cartSummary.appendChild(checkoutBtn);
     }
+}
+
+function makeSummaryRow(label, value, isTotal) {
+    const row = document.createElement('div');
+    row.className = 'summary-row' + (isTotal ? ' total' : '');
+
+    const labelEl = document.createElement('span');
+    labelEl.textContent = label;
+    const valueEl = document.createElement('span');
+    valueEl.textContent = value;
+
+    row.appendChild(labelEl);
+    row.appendChild(valueEl);
+    return row;
 }
 
 function checkout() {

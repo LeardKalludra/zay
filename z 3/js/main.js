@@ -1,33 +1,41 @@
 
 document.addEventListener('DOMContentLoaded', function() {
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-    
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-        });
-    }
-    
+    setupMenuToggle();
     initHeroSlider();
-    
     initSearch();
-    
-    if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/')) {
-        loadFeaturedProducts();
-    }
-    
-    if (window.location.pathname.includes('shop.html')) {
-        loadShopProducts();
-    }
-    
     initScrollAnimations();
-    
     initScrollToTop();
-    
     initFloatingCart();
     initUserMenu();
+
+    if (onHome()) {
+        loadFeaturedProducts();
+    }
+
+    if (onShop()) {
+        loadShopProducts();
+    }
 });
+
+function setupMenuToggle() {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    if (!hamburger || !navMenu) return;
+
+    hamburger.addEventListener('click', function() {
+        navMenu.classList.toggle('active');
+    });
+}
+
+function onHome() {
+    return window.location.pathname.includes('index.html') ||
+        window.location.pathname === '/' ||
+        window.location.pathname.endsWith('/');
+}
+
+function onShop() {
+    return window.location.pathname.includes('shop.html');
+}
 
 function initScrollAnimations() {
     const observerOptions = {
@@ -35,24 +43,25 @@ function initScrollAnimations() {
         rootMargin: '0px 0px -50px 0px'
     };
     
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
             }
         });
     }, observerOptions);
     
-    document.querySelectorAll('.fade-in-up').forEach(el => {
-        observer.observe(el);
-    });
+    const fadeItems = document.querySelectorAll('.fade-in-up');
+    for (let i = 0; i < fadeItems.length; i++) {
+        observer.observe(fadeItems[i]);
+    }
 }
 
 function initScrollToTop() {
     const scrollBtn = document.getElementById('scrollToTop');
     if (!scrollBtn) return;
     
-    window.addEventListener('scroll', () => {
+    window.addEventListener('scroll', function() {
         if (window.pageYOffset > 300) {
             scrollBtn.classList.add('show');
         } else {
@@ -149,8 +158,12 @@ function initHeroSlider() {
     let currentSlide = 0;
     
     function showSlide(index) {
-        slides.forEach(slide => slide.classList.remove('active'));
-        indicators.forEach(indicator => indicator.classList.remove('active'));
+        for (let i = 0; i < slides.length; i++) {
+            slides[i].classList.remove('active');
+        }
+        for (let j = 0; j < indicators.length; j++) {
+            indicators[j].classList.remove('active');
+        }
         
         currentSlide = index;
         if (currentSlide >= slides.length) currentSlide = 0;
@@ -163,24 +176,24 @@ function initHeroSlider() {
     }
     
     if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
+        nextBtn.addEventListener('click', function() {
             showSlide(currentSlide + 1);
         });
     }
     
     if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
+        prevBtn.addEventListener('click', function() {
             showSlide(currentSlide - 1);
         });
     }
     
-    indicators.forEach((indicator, index) => {
-        indicator.addEventListener('click', () => {
-            showSlide(index);
+    for (let i = 0; i < indicators.length; i++) {
+        indicators[i].addEventListener('click', function() {
+            showSlide(i);
         });
-    });
+    }
     
-    setInterval(() => {
+    setInterval(function() {
         showSlide(currentSlide + 1);
     }, 5000);
 }
@@ -193,7 +206,7 @@ function initSearch() {
     const searchResults = document.getElementById('searchResults');
     
     if (searchIcon && searchModal) {
-        searchIcon.addEventListener('click', (e) => {
+        searchIcon.addEventListener('click', function(e) {
             e.preventDefault();
             searchModal.style.display = 'block';
             if (searchInput) searchInput.focus();
@@ -201,13 +214,13 @@ function initSearch() {
     }
     
     if (closeSearch) {
-        closeSearch.addEventListener('click', () => {
+        closeSearch.addEventListener('click', function() {
             searchModal.style.display = 'none';
         });
     }
     
     if (searchModal) {
-        searchModal.addEventListener('click', (e) => {
+        searchModal.addEventListener('click', function(e) {
             if (e.target === searchModal) {
                 searchModal.style.display = 'none';
             }
@@ -216,7 +229,7 @@ function initSearch() {
     
     if (searchInput && searchResults) {
         let searchTimeout;
-        searchInput.addEventListener('input', (e) => {
+        searchInput.addEventListener('input', function(e) {
             clearTimeout(searchTimeout);
             const query = e.target.value.trim();
             
