@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Zay Shop</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <section class="auth-page">
+        <div class="container">
+            <div class="auth-grid">
+                <div class="auth-copy">
+                    <span class="eyebrow-text">Join the community</span>
+                    <h1>Create your Zay account in minutes.</h1>
+                    <p>Unlock faster checkout, synced wishlists, and first dibs on limited drops. Your membership keeps every cart connected across devices.</p>
+                    <div class="auth-pills">
+                        <span class="pill">Member pricing</span>
+                        <span class="pill pill-secondary">Saved preferences</span>
+                        <span class="pill">Priority support</span>
+                    </div>
+                    <div class="auth-metrics">
+                        <div class="metric">
+                            <strong>48h</strong>
+                            <span>Early access alerts</span>
+                        </div>
+                        <div class="metric">
+                            <strong>Zero</strong>
+                            <span>Joining fees</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="auth-card">
+                    <div class="auth-card-header">
+                        <a href="index.html">Zay</a>
+                        <h3>Sign Up</h3>
+                        <p>Tell us a few details to set up your account.</p>
+                    </div>
+                    <form class="auth-form" id="form">
+                        <div class="form-group">
+                            <label for="signupName">Full name</label>
+                            <input type="text" id="signupName" name="name" placeholder="Alex Morgan">
+                            <p class="error"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">Email address</label>
+                            <input type="email" id="signupEmail" name="email" placeholder="you@example.com">
+                            <p class="error"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" id="signupPassword" name="password" placeholder="Create a password">
+                            <p class="error"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupConfirm">Confirm password</label>
+                            <input type="password" id="signupConfirm" name="confirm_password" placeholder="Re-enter your password">
+                            <p class="error"></p>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary auth-submit">Create account</button>
+                    </form>
+                    <p class="auth-switch">Already have an account? <a href="login.html">Log in</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   
+
+    
+
+
+    <script src="js/products.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/signup.js"></script>
+</body>
+</html>
