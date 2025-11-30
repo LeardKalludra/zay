@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - Zay E-commerce</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Shopping Cart - Zay E-commerce</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
 
     <nav class="navbar">
         <div class="container">
@@ -19,7 +18,7 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="shop.html">Shop</a></li>
-                <li><a href="contact.html" class="active">Contact</a></li>
+                <li><a href="contact.html">Contact</a></li>
             </ul>
             <div class="nav-icons">
                 <a href="#" class="search-icon"><i class="fas fa-search"></i></a>
@@ -52,75 +51,91 @@
     </nav>
 
 
-    <section class="page-header">
+    <section class="shop-header">
         <div class="container">
-            <h1>Contact Us</h1>
-            <p>Get in touch with us</p>
+            <h1>Shopping Cart</h1>
+            <p>Review your items and proceed to checkout</p>
         </div>
     </section>
 
 
-    <section class="page-content">
+    <section class="cart-container">
         <div class="container">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;">
-                <div>
-                    <h2 style="font-size: 32px; margin-bottom: 40px; color: var(--text-dark); font-weight: 700;">Get in Touch</h2>
-                    <div class="contact-info-card fade-in-up">
-                        <h3>
-                            <i class="fas fa-map-marker-alt"></i>
-                            Address
-                        </h3>
-                        <p>123 Consectetur at ligula 10660<br>New York, NY 10001<br>United States</p>
-                    </div>
-                    <div class="contact-info-card fade-in-up">
-                        <h3>
-                            <i class="fas fa-phone"></i>
-                            Phone
-                        </h3>
-                        <p>Main: 010-020-0340<br>Mobile: 010-020-0341<br>Fax: 010-020-0342</p>
-                    </div>
-                    <div class="contact-info-card fade-in-up">
-                        <h3>
-                            <i class="fas fa-envelope"></i>
-                            Email
-                        </h3>
-                        <p>info@company.com<br>support@company.com<br>sales@company.com</p>
-                    </div>
-                    <div class="contact-info-card fade-in-up">
-                        <h3>
-                            <i class="fas fa-clock"></i>
-                            Business Hours
-                        </h3>
-                        <p>Monday - Friday: 9:00 AM - 6:00 PM<br>Saturday: 10:00 AM - 4:00 PM<br>Sunday: Closed</p>
-                    </div>
-                </div>
-                
-                <div class="contact-form fade-in-up">
-                    <h2 style="font-size: 32px; margin-bottom: 30px; color: var(--text-dark); font-weight: 700;">Send us a Message</h2>
-                    <form id="contactForm" onsubmit="handleContactSubmit(event)">
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="subject">Subject</label>
-                            <input type="text" id="subject" name="subject" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Message</label>
-                            <textarea id="message" name="message" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
-                    </form>
-                </div>
+           
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="cartItems">
+             
+                </tbody>
+            </table>
+
+            <div class="cart-summary" id="cartSummary">
             </div>
         </div>
     </section>
 
+    <section class="cart-container" id="ordersSection">
+        <div class="container">
+            <h2 style="margin-bottom: 12px;">Your Orders</h2>
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="orderHistoryBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="checkout-modal-content">
+            <button class="checkout-modal-close" onclick="closeCheckoutModal()">&times;</button>
+            <h3 style="margin-bottom: 10px;">Secure Checkout</h3>
+            <p style="margin-bottom: 20px;">Enter your details to finalize delivery. Your cart total is <strong>$<span id="checkoutDue">0.00</span></strong>.</p>
+            <form id="checkoutForm" onsubmit="handleCheckoutSubmit(event)">
+                <div class="checkout-form-grid">
+                    <div class="form-group">
+                        <label for="checkoutName">Full Name</label>
+                        <input type="text" id="checkoutName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkoutEmail">Email</label>
+                        <input type="email" id="checkoutEmail" required>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="checkoutAddress">Address</label>
+                        <input type="text" id="checkoutAddress" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkoutCity">City</label>
+                        <input type="text" id="checkoutCity" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkoutPostal">Postal Code</label>
+                        <input type="text" id="checkoutPostal" required>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="checkoutCard">Card Number</label>
+                        <input type="text" id="checkoutCard" placeholder="XXXX XXXX XXXX XXXX" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary checkout-btn">Place Order</button>
+            </form>
+            <div class="checkout-confirmation" id="checkoutConfirmation"></div>
+        </div>
+    </div>
 
     <footer class="footer">
         <div class="container">
@@ -162,7 +177,6 @@
         </div>
     </footer>
 
-   
     <div class="search-modal" id="searchModal">
         <div class="search-modal-content">
             <span class="close-search">&times;</span>
@@ -171,36 +185,16 @@
         </div>
     </div>
 
-
     <div class="floating-widgets">
         <button class="scroll-to-top" id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
             <i class="fas fa-arrow-up"></i>
         </button>
     </div>
-    
-    <div class="floating-cart-widget" id="floatingCart">
-        <div class="floating-cart-items" id="floatingCartItems">
-            <p style="text-align: center; padding: 20px; color: var(--text-gray);">Your cart is empty</p>
-        </div>
-        <div class="floating-cart-footer">
-            <div class="floating-cart-total">
-                <strong>Total: $<span id="floatingCartTotal">0.00</span></strong>
-            </div>
-            <a href="cart.html" class="btn btn-primary" style="width: 100%; margin-top: 15px;">View Cart</a>
-        </div>
-    </div>
 
-    <script src="js/products.js"></script>
-    <script src="js/cart.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/main.js"></script>
-    <script>
-        function handleContactSubmit(event) {
-            event.preventDefault();
-            alert('Thank you for your message! We will get back to you soon.');
-            document.getElementById('contactForm').reset();
-        }
-    </script>
+    <script src="../assets/js/products.js"></script>
+    <script src="../assets/js/cart.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/main.js"></script>
 </body>
 </html>
 
