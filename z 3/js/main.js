@@ -61,13 +61,6 @@ function initScrollToTop() {
     });
 }
 
-function toggleFloatingCart() {
-    const cartWidget = document.getElementById('floatingCart');
-    if (cartWidget) {
-        cartWidget.classList.toggle('active');
-    }
-}
-
 function initFloatingCart() {
     updateFloatingCart();
 }
