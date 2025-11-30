@@ -307,6 +307,92 @@ body {
     background: var(--bg-light);
 }
 
+button.link-muted {
+    background: none;
+    border: none;
+    color: var(--text-gray);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.inventory-modal,
+.product-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.inventory-modal.active,
+.product-modal.active {
+    display: flex;
+}
+
+.inventory-modal__body,
+.product-modal__body {
+    background: var(--bg-white);
+    padding: 20px;
+    border-radius: 14px;
+    width: min(680px, 92vw);
+    max-height: 80vh;
+    overflow: auto;
+    box-shadow: 0 20px 60px rgba(15,23,42,0.25);
+}
+
+.inventory-modal__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.inventory-manage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 14px 0;
+}
+
+.inventory-manage-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-light);
+}
+
+.inventory-manage-row input {
+    width: 120px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.inventory-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.close-modal {
+    background: none;
+    border: 1px solid var(--border-color);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
 .customer-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

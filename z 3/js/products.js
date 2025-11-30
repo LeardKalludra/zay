@@ -4,7 +4,7 @@ const products = [
         name: "Gym Weight Set",
         price: 240.00,
         originalPrice: 299.00,
-        image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=600&fit=crop&q=80",
+        image: "https://i.insider.com/5e8247562ff83953b63efa46?width=700",
         description: "Professional grade gym weights for your home workout. Durable and ergonomic design.",
         rating: 5,
         reviews: 24,
@@ -36,7 +36,7 @@ const products = [
         id: 4,
         name: "Luxury Timepiece",
         price: 1200.00,
-        image: "https://images.unsplash.com/photo-1524592094714-0f0654e20315?w=600&h=600&fit=crop&q=80",
+        image: "https://mygemma.com/cdn/shop/articles/WPD-Top-Blog-Image-2022-08-24T120007.572_4737eeb0-fca0-49ff-a296-c46e96a5f375.png?v=1695912604",
         description: "Elegant luxury watch with Swiss movement and premium materials.",
         rating: 5,
         reviews: 32,
@@ -110,7 +110,7 @@ const products = [
         name: "Basketball Shoes Pro",
         price: 340.00,
         originalPrice: 420.00,
-        image: "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=600&h=600&fit=crop&q=80",
+        image: "https://www.anta.ph/cdn/shop/files/112431111-1-2.jpg?v=1727333458",
         description: "Professional basketball shoes with superior ankle support and cushioning.",
         rating: 5,
         reviews: 67,
@@ -162,7 +162,7 @@ const products = [
         id: 16,
         name: "Chronograph Watch",
         price: 650.00,
-        image: "https://images.unsplash.com/photo-1524592094714-0f0654e20315?w=600&h=600&fit=crop&q=80",
+        image: "https://monchwatches.com/cdn/shop/files/Shot9.png?v=1755008718&width=2048",
         description: "Precision chronograph watch with stopwatch functionality and tachymeter.",
         rating: 5,
         reviews: 28,
@@ -173,7 +173,7 @@ const products = [
         name: "Hiking Boots",
         price: 280.00,
         originalPrice: 350.00,
-        image: "https://images.unsplash.com/photo-1608256246200-53bd53f83321?w=600&h=600&fit=crop&q=80",
+        image: "https://bahe.co/cdn/shop/files/bahe-rediscover-grounding-boot_6_bb6b3e25-bcad-4538-9a9c-feaa4ce19d6d.jpg?format=pjpg&v=1757170661&width=565",
         description: "Rugged hiking boots with waterproof protection and superior traction.",
         rating: 5,
         reviews: 41,
@@ -214,7 +214,7 @@ const products = [
         id: 21,
         name: "Resistance Bands Set",
         price: 45.00,
-        image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=600&fit=crop&q=80",
+        image: "https://www.atreq.com/cdn/shop/products/ATREQProResistanceTubeSet.jpg?v=1604996822",
         description: "Complete resistance bands set with multiple resistance levels.",
         rating: 5,
         reviews: 94,
@@ -236,7 +236,7 @@ const products = [
         name: "Tennis Shoes",
         price: 165.00,
         originalPrice: 220.00,
-        image: "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=600&h=600&fit=crop&q=80",
+        image: "https://static.nike.com/a/images/t_web_pw_592_v2/f_auto/e2fb0279-1ea6-4d36-a19c-9bb8e1b699c8/M+ZOOM+VAPOR+12+HC+PRM.png",
         description: "Professional tennis shoes with excellent court grip and stability.",
         rating: 4,
         reviews: 26,
@@ -295,12 +295,19 @@ function getDynamicProducts() {
         });
     } catch (e) {
     }
-    return combined;
+    const removed = getRemovedProductIds();
+    const filtered = combined.filter(function(p) { return !removed.includes(p.id); });
+    const overridden = applyProductOverrides(filtered);
+    return attachInventoryToProducts(overridden);
 }
 
 function renderProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card';
+    const outOfStock = typeof product.stock === 'number' && product.stock <= 0;
+    if (outOfStock) {
+        card.classList.add('out-of-stock');
+    }
     card.dataset.productId = product.id;
 
     const media = document.createElement('div');
@@ -335,6 +342,13 @@ function renderProductCard(product) {
     rating.innerHTML = makeStars(product.rating) + '<small>' + product.reviews + ' reviews</small>';
     meta.appendChild(rating);
 
+    if (typeof product.stock === 'number') {
+        const stock = document.createElement('span');
+        stock.className = 'stock-chip ' + (outOfStock ? 'stock-empty' : 'stock-available');
+        stock.textContent = outOfStock ? 'Out of stock' : (product.stock + ' in stock');
+        meta.appendChild(stock);
+    }
+
     info.appendChild(meta);
 
     const title = document.createElement('h3');
@@ -367,25 +381,110 @@ function renderProductCard(product) {
 
     priceRow.appendChild(priceStack);
 
-    const delivery = document.createElement('span');
-    delivery.className = 'product-delivery-pill';
-    delivery.textContent = 'Ships in 48h';
-    priceRow.appendChild(delivery);
 
     info.appendChild(priceRow);
 
     const button = document.createElement('button');
     button.className = 'add-to-cart';
-    button.textContent = 'Add to Cart';
-    button.addEventListener('click', function() {
-        addToCart(product.id);
-    });
+    button.textContent = outOfStock ? 'Out of Stock' : 'Add to Cart';
+    button.disabled = outOfStock;
+    if (outOfStock) {
+        button.classList.add('disabled');
+    } else {
+        button.addEventListener('click', function() {
+            addToCart(product.id);
+        });
+    }
     info.appendChild(button);
 
     card.appendChild(media);
     card.appendChild(info);
 
     return card;
+}
+
+function getInventoryMap() {
+    try {
+        return JSON.parse(localStorage.getItem('inventory')) || {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function saveInventoryMap(map) {
+    localStorage.setItem('inventory', JSON.stringify(map));
+}
+
+function getProductStock(productId) {
+    const inventory = getInventoryMap();
+    if (inventory[productId] !== undefined) return inventory[productId];
+    const product = products.find(p => p.id === productId);
+    if (product && typeof product.stock === 'number') return product.stock;
+    return 0;
+}
+
+function setProductStock(productId, quantity) {
+    const inventory = getInventoryMap();
+    inventory[productId] = Math.max(0, parseInt(quantity, 10) || 0);
+    saveInventoryMap(inventory);
+}
+
+function removeProductStock(productId) {
+    const inventory = getInventoryMap();
+    if (inventory[productId] !== undefined) {
+        delete inventory[productId];
+        saveInventoryMap(inventory);
+    }
+}
+
+function attachInventoryToProducts(list) {
+    const inventory = getInventoryMap();
+    let updated = false;
+    const withInventory = list.map(function(item) {
+        const fallback = typeof item.stock === 'number' ? item.stock : 20;
+        const stock = inventory[item.id] !== undefined ? inventory[item.id] : fallback;
+        if (inventory[item.id] === undefined) {
+            inventory[item.id] = stock;
+            updated = true;
+        }
+        return { ...item, stock: stock };
+    });
+    if (updated) saveInventoryMap(inventory);
+    return withInventory;
+}
+
+function getRemovedProductIds() {
+    try {
+        return (JSON.parse(localStorage.getItem('removedProducts')) || []).map(function(id){ return parseInt(id, 10); });
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveRemovedProductIds(list) {
+    localStorage.setItem('removedProducts', JSON.stringify(list));
+}
+
+function getProductOverrides() {
+    try {
+        return JSON.parse(localStorage.getItem('productOverrides')) || {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function saveProductOverrides(map) {
+    localStorage.setItem('productOverrides', JSON.stringify(map));
+}
+
+function applyProductOverrides(list) {
+    const overrides = getProductOverrides();
+    if (!overrides || typeof overrides !== 'object') return list;
+    return list.map(function(item) {
+        const override = overrides[item.id];
+        if (!override) return item;
+        return { ...item, ...override };
+    });
 }
 
 function makeStars(rating) {
