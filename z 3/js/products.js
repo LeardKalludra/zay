@@ -283,38 +283,6 @@ function searchProducts(query) {
     );
 }
 
-<<<<<<< Updated upstream
-function renderProductCard(product) {
-    const stars = '★'.repeat(product.rating) + '☆'.repeat(5 - product.rating);
-    const badge = product.badge ? `<div class="product-badge badge-${product.badge.toLowerCase()}">${product.badge}</div>` : '';
-    const originalPrice = product.originalPrice ? `<span class="price-original">$${product.originalPrice.toFixed(2)}</span>` : '';
-    const categoryLabel = product.category ? product.category.replace(/^\w/, c => c.toUpperCase()) : 'Featured';
-    
-    return `
-        <div class="product-card" data-product-id="${product.id}">
-            <div class="product-media">
-                ${badge}
-                <img src="${product.image}" alt="${product.name}" loading="lazy">
-            </div>
-            <div class="product-info">
-                <div class="product-meta">
-                    <span class="product-category-pill">${categoryLabel}</span>
-                    <span class="product-rating-badge">${stars}<small>${product.reviews} reviews</small></span>
-                </div>
-                <h3 class="product-title">${product.name}</h3>
-                <p class="product-description">${product.description}</p>
-                <div class="product-price-row">
-                    <div class="price-stack">
-                        <span class="price-current">$${product.price.toFixed(2)}</span>
-                        ${originalPrice}
-                    </div>
-                    <span class="product-delivery-pill">Ships in 48h</span>
-                </div>
-                <button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>
-            </div>
-        </div>
-    `;
-=======
 function getDynamicProducts() {
     const combined = [...products];
     try {
@@ -424,7 +392,6 @@ function makeStars(rating) {
     const filled = '★'.repeat(rating);
     const empty = '☆'.repeat(5 - rating);
     return filled + empty;
->>>>>>> Stashed changes
 }
 
 function renderProductsGrid(productsArray, containerId) {
@@ -432,13 +399,6 @@ function renderProductsGrid(productsArray, containerId) {
     if (!container) return;
     
     if (productsArray.length === 0) {
-<<<<<<< Updated upstream
-        container.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: var(--text-gray); font-size: 18px; padding: 60px;">No products found. Try a different search or filter.</p>';
-        return;
-    }
-    
-    container.innerHTML = productsArray.map(product => renderProductCard(product)).join('');
-=======
         const empty = document.createElement('p');
         empty.style.textAlign = 'center';
         empty.style.gridColumn = '1/-1';
@@ -455,5 +415,4 @@ function renderProductsGrid(productsArray, containerId) {
     for (let i = 0; i < productsArray.length; i++) {
         container.appendChild(renderProductCard(productsArray[i]));
     }
->>>>>>> Stashed changes
 }
