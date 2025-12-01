@@ -2086,10 +2086,10 @@ body.modal-open {
 }
 
 .contact-form {
-    max-width: 700px;
-    margin: 0 auto;
+    max-width: 900px;
+    margin-top: 90px;
     background-color: var(--bg-white);
-    padding: 50px;
+    padding: 29px;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
