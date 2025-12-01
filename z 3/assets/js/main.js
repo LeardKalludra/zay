@@ -1,3 +1,8 @@
+document.addEventListener("DOMContentLoaded", () => {
+    const yearSpan = document.getElementById("year");
+    yearSpan.textContent = new Date().getFullYear();
+});
+
 
 document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.querySelector('.hamburger');
@@ -64,6 +69,10 @@ function initScrollToTop() {
 function initFloatingCart() {
     updateFloatingCart();
 }
+
+
+
+
 
 function updateFloatingCart() {
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
