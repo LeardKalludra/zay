@@ -4,13 +4,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const navMenu = document.querySelector('.nav-menu');
     
     if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => {
+        hamburger.addEventListener('click', function() {
             navMenu.classList.toggle('active');
         });
     }
     
     initHeroSlider();
-    
     initSearch();
     
     if (window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/')) {
@@ -22,12 +21,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     initScrollAnimations();
-    
     initScrollToTop();
-    
     initFloatingCart();
     initUserMenu();
 });
+
+function clearElement(el) {
+    if (!el) return;
+    while (el.firstChild) {
+        el.removeChild(el.firstChild);
+    }
+}
 
 function initScrollAnimations() {
     const observerOptions = {
@@ -35,15 +39,15 @@ function initScrollAnimations() {
         rootMargin: '0px 0px -50px 0px'
     };
     
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
             }
         });
     }, observerOptions);
     
-    document.querySelectorAll('.fade-in-up').forEach(el => {
+    document.querySelectorAll('.fade-in-up').forEach(function(el) {
         observer.observe(el);
     });
 }
@@ -52,7 +56,7 @@ function initScrollToTop() {
     const scrollBtn = document.getElementById('scrollToTop');
     if (!scrollBtn) return;
     
-    window.addEventListener('scroll', () => {
+    window.addEventListener('scroll', function() {
         if (window.pageYOffset > 300) {
             scrollBtn.classList.add('show');
         } else {
@@ -72,30 +76,54 @@ function updateFloatingCart() {
     const floatingCartCount = document.querySelector('.floating-cart-count');
     
     if (floatingCartCount) {
-        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        let count = 0;
+        for (let i = 0; i < cart.length; i++) {
+            count += cart[i].quantity;
+        }
         floatingCartCount.textContent = count;
     }
     
     if (!floatingCartItems) return;
+    clearElement(floatingCartItems);
     
     if (cart.length === 0) {
-        floatingCartItems.innerHTML = '<p style="text-align: center; padding: 20px; color: var(--text-gray);">Your cart is empty</p>';
+        const emptyMsg = document.createElement('p');
+        emptyMsg.style.textAlign = 'center';
+        emptyMsg.style.padding = '20px';
+        emptyMsg.style.color = 'var(--text-gray)';
+        emptyMsg.textContent = 'Your cart is empty';
+        floatingCartItems.appendChild(emptyMsg);
         if (floatingCartTotal) floatingCartTotal.textContent = '0.00';
         return;
     }
     
-    floatingCartItems.innerHTML = cart.map(item => `
-        <div class="floating-cart-item">
-            <img src="${item.image}" alt="${item.name}">
-            <div class="floating-cart-item-info">
-                <h5>${item.name}</h5>
-                <p>$${item.price.toFixed(2)} x ${item.quantity}</p>
-            </div>
-        </div>
-    `).join('');
+    cart.forEach(function(item) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'floating-cart-item';
+
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.alt = item.name;
+        wrapper.appendChild(img);
+
+        const info = document.createElement('div');
+        info.className = 'floating-cart-item-info';
+        const title = document.createElement('h5');
+        title.textContent = item.name;
+        const meta = document.createElement('p');
+        meta.textContent = '$' + item.price.toFixed(2) + ' x ' + item.quantity;
+        info.appendChild(title);
+        info.appendChild(meta);
+
+        wrapper.appendChild(info);
+        floatingCartItems.appendChild(wrapper);
+    });
     
     if (floatingCartTotal) {
-        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let total = 0;
+        for (let i = 0; i < cart.length; i++) {
+            total += cart[i].price * cart[i].quantity;
+        }
         floatingCartTotal.textContent = total.toFixed(2);
     }
 }
@@ -124,7 +152,7 @@ function initUserMenu() {
     }
 
     if (logoutBtn && typeof logout === 'function') {
-        logoutBtn.addEventListener('click', (e) => {
+        logoutBtn.addEventListener('click', function(e) {
             e.preventDefault();
             logout();
         });
@@ -142,8 +170,8 @@ function initHeroSlider() {
     let currentSlide = 0;
     
     function showSlide(index) {
-        slides.forEach(slide => slide.classList.remove('active'));
-        indicators.forEach(indicator => indicator.classList.remove('active'));
+        slides.forEach(function(slide) { slide.classList.remove('active'); });
+        indicators.forEach(function(indicator) { indicator.classList.remove('active'); });
         
         currentSlide = index;
         if (currentSlide >= slides.length) currentSlide = 0;
@@ -156,24 +184,24 @@ function initHeroSlider() {
     }
     
     if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
+        nextBtn.addEventListener('click', function() {
             showSlide(currentSlide + 1);
         });
     }
     
     if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
+        prevBtn.addEventListener('click', function() {
             showSlide(currentSlide - 1);
         });
     }
     
-    indicators.forEach((indicator, index) => {
-        indicator.addEventListener('click', () => {
+    indicators.forEach(function(indicator, index) {
+        indicator.addEventListener('click', function() {
             showSlide(index);
         });
     });
     
-    setInterval(() => {
+    setInterval(function() {
         showSlide(currentSlide + 1);
     }, 5000);
 }
@@ -186,7 +214,7 @@ function initSearch() {
     const searchResults = document.getElementById('searchResults');
     
     if (searchIcon && searchModal) {
-        searchIcon.addEventListener('click', (e) => {
+        searchIcon.addEventListener('click', function(e) {
             e.preventDefault();
             searchModal.style.display = 'block';
             if (searchInput) searchInput.focus();
@@ -194,13 +222,13 @@ function initSearch() {
     }
     
     if (closeSearch) {
-        closeSearch.addEventListener('click', () => {
+        closeSearch.addEventListener('click', function() {
             searchModal.style.display = 'none';
         });
     }
     
     if (searchModal) {
-        searchModal.addEventListener('click', (e) => {
+        searchModal.addEventListener('click', function(e) {
             if (e.target === searchModal) {
                 searchModal.style.display = 'none';
             }
@@ -209,13 +237,13 @@ function initSearch() {
     
     if (searchInput && searchResults) {
         let searchTimeout;
-        searchInput.addEventListener('input', (e) => {
+        searchInput.addEventListener('input', function(e) {
             clearTimeout(searchTimeout);
             const query = e.target.value.trim();
             
-            searchTimeout = setTimeout(() => {
+            searchTimeout = setTimeout(function() {
                 if (query.length < 2) {
-                    searchResults.innerHTML = '';
+                    clearElement(searchResults);
                     return;
                 }
                 
@@ -227,22 +255,53 @@ function initSearch() {
 }
 
 function displaySearchResults(results, container) {
+    clearElement(container);
     if (results.length === 0) {
-        container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">No products found.</p>';
+        const empty = document.createElement('p');
+        empty.style.padding = '20px';
+        empty.style.textAlign = 'center';
+        empty.style.color = '#999';
+        empty.textContent = 'No products found.';
+        container.appendChild(empty);
         return;
     }
     
-    container.innerHTML = results.map(product => `
-        <div class="search-result-item" onclick="window.location.href='shop.html'">
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <img src="${product.image}" alt="${product.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
-                <div>
-                    <h4 style="margin-bottom: 5px;">${product.name}</h4>
-                    <p style="color: #666; font-size: 14px;">$${product.price.toFixed(2)}</p>
-                </div>
-            </div>
-        </div>
-    `).join('');
+    results.forEach(function(product) {
+        const item = document.createElement('div');
+        item.className = 'search-result-item';
+        item.addEventListener('click', function() {
+            window.location.href = 'shop.html';
+        });
+
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.gap = '15px';
+        row.style.alignItems = 'center';
+
+        const img = document.createElement('img');
+        img.src = product.image;
+        img.alt = product.name;
+        img.style.width = '60px';
+        img.style.height = '60px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '5px';
+
+        const info = document.createElement('div');
+        const title = document.createElement('h4');
+        title.style.marginBottom = '5px';
+        title.textContent = product.name;
+        const price = document.createElement('p');
+        price.style.color = '#666';
+        price.style.fontSize = '14px';
+        price.textContent = '$' + product.price.toFixed(2);
+        info.appendChild(title);
+        info.appendChild(price);
+
+        row.appendChild(img);
+        row.appendChild(info);
+        item.appendChild(row);
+        container.appendChild(item);
+    });
 }
 
 function loadFeaturedProducts() {
@@ -250,13 +309,13 @@ function loadFeaturedProducts() {
     renderProductsGrid(featuredProducts, 'featuredProducts');
 }
 
-    function filterProducts(category) {
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+function filterProducts(category) {
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
         btn.classList.remove('active');
     });
     event.target.classList.add('active');
     
-    let products = category === 'all' ? getAllProducts() : getProductsByCategory(category);
+    const products = category === 'all' ? getAllProducts() : getProductsByCategory(category);
     renderProductsGrid(products, 'featuredProducts');
 }
 
@@ -264,7 +323,7 @@ function loadShopProducts() {
     const urlParams = new URLSearchParams(window.location.search);
     const category = urlParams.get('category');
     
-    let productsToShow = category ? getProductsByCategory(category) : getAllProducts();
+    const productsToShow = category ? getProductsByCategory(category) : getAllProducts();
     renderProductsGrid(productsToShow, 'shopProducts');
     
     const categorySelect = document.getElementById('categoryFilter');
@@ -289,36 +348,10 @@ function loadShopProducts() {
     }
 }
 
-    function handleNewsletter(event) {
+function handleNewsletter(event) {
     event.preventDefault();
     const email = event.target.querySelector('input[type="email"]').value;
     alert('Thank you for subscribing! We\'ll send you exclusive offers and updates.');
     event.target.reset();
 }
-
-    const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
 

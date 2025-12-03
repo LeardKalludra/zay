@@ -275,17 +275,21 @@ function searchProducts(query) {
 }
 
 function getDynamicProducts() {
-    const combined = [...products];
+    const combined = [];
+    for (let i = 0; i < products.length; i++) {
+        combined.push(products[i]);
+    }
     try {
         const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
         const adminProducts = JSON.parse(localStorage.getItem('adminProducts')) || [];
-        [...storedProducts, ...adminProducts].forEach(p => {
-            if (p && p.id && !combined.find(item => item.id === p.id)) {
-                combined.push(p);
-            }
-        });
-    } catch (e) {
-    }
+        const extra = storedProducts.concat(adminProducts);
+        for (let i = 0; i < extra.length; i++) {
+            const p = extra[i];
+            if (!p || !p.id) continue;
+            const exists = combined.some(function(item) { return item.id === p.id; });
+            if (!exists) combined.push(p);
+        }
+    } catch (e) {}
     const removed = getRemovedProductIds();
     const filtered = combined.filter(function(p) { return !removed.includes(p.id); });
     const overridden = applyProductOverrides(filtered);
@@ -330,7 +334,12 @@ function renderProductCard(product) {
 
     const rating = document.createElement('span');
     rating.className = 'product-rating-badge';
-    rating.innerHTML = makeStars(product.rating) + '<small>' + product.reviews + ' reviews</small>';
+    const ratingStars = document.createElement('span');
+    ratingStars.textContent = makeStars(product.rating);
+    const ratingReviews = document.createElement('small');
+    ratingReviews.textContent = (product.reviews || 0) + ' reviews';
+    rating.appendChild(ratingStars);
+    rating.appendChild(ratingReviews);
     meta.appendChild(rating);
 
     if (typeof product.stock === 'number') {
@@ -431,22 +440,42 @@ function removeProductStock(productId) {
 function attachInventoryToProducts(list) {
     const inventory = getInventoryMap();
     let updated = false;
-    const withInventory = list.map(function(item) {
+    const withInventory = [];
+    for (let i = 0; i < list.length; i++) {
+        const item = list[i];
         const fallback = typeof item.stock === 'number' ? item.stock : 20;
         const stock = inventory[item.id] !== undefined ? inventory[item.id] : fallback;
         if (inventory[item.id] === undefined) {
             inventory[item.id] = stock;
             updated = true;
         }
-        return { ...item, stock: stock };
-    });
+        const copy = {
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            image: item.image,
+            description: item.description,
+            category: item.category,
+            rating: item.rating,
+            reviews: item.reviews,
+            badge: item.badge,
+            stock: stock
+        };
+        withInventory.push(copy);
+    }
     if (updated) saveInventoryMap(inventory);
     return withInventory;
 }
 
 function getRemovedProductIds() {
     try {
-        return (JSON.parse(localStorage.getItem('removedProducts')) || []).map(function(id){ return parseInt(id, 10); });
+        const raw = JSON.parse(localStorage.getItem('removedProducts')) || [];
+        const cleaned = [];
+        for (let i = 0; i < raw.length; i++) {
+            const num = parseInt(raw[i], 10);
+            if (!isNaN(num)) cleaned.push(num);
+        }
+        return cleaned;
     } catch (e) {
         return [];
     }
@@ -471,11 +500,29 @@ function saveProductOverrides(map) {
 function applyProductOverrides(list) {
     const overrides = getProductOverrides();
     if (!overrides || typeof overrides !== 'object') return list;
-    return list.map(function(item) {
+    const updated = [];
+    for (let i = 0; i < list.length; i++) {
+        const item = list[i];
         const override = overrides[item.id];
-        if (!override) return item;
-        return { ...item, ...override };
-    });
+        if (!override) {
+            updated.push(item);
+            continue;
+        }
+        const merged = {
+            id: item.id,
+            name: override.name || item.name,
+            price: override.price || item.price,
+            image: override.image || item.image,
+            description: override.description || item.description,
+            category: override.category || item.category,
+            rating: item.rating,
+            reviews: item.reviews,
+            badge: item.badge,
+            stock: item.stock
+        };
+        updated.push(merged);
+    }
+    return updated;
 }
 
 function makeStars(rating) {
@@ -487,6 +534,7 @@ function makeStars(rating) {
 function renderProductsGrid(productsArray, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
+    clearElement(container);
     
     if (productsArray.length === 0) {
         const empty = document.createElement('p');
@@ -496,13 +544,18 @@ function renderProductsGrid(productsArray, containerId) {
         empty.style.fontSize = '18px';
         empty.style.padding = '60px';
         empty.textContent = 'No products found. Try a different search or filter.';
-        container.innerHTML = '';
         container.appendChild(empty);
         return;
     }
     
-    container.innerHTML = '';
     for (let i = 0; i < productsArray.length; i++) {
         container.appendChild(renderProductCard(productsArray[i]));
+    }
+}
+
+function clearElement(el) {
+    if (!el) return;
+    while (el.firstChild) {
+        el.removeChild(el.firstChild);
     }
 }

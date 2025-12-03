@@ -13,6 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
     initProductEditModal();
 });
 
+function clearElement(el) {
+    if (!el) return;
+    while (el.firstChild) {
+        el.removeChild(el.firstChild);
+    }
+}
+
 function collectDashboardData() {
     let users = JSON.parse(localStorage.getItem('users')) || [];
     let carts = collectCarts();
@@ -174,7 +181,7 @@ function sumItems(items) {
 function renderMetrics(data) {
     const container = document.getElementById('metricsContainer');
     if (!container) return;
-    container.innerHTML = '';
+    clearElement(container);
     data.metrics.forEach(function(item) {
         const card = document.createElement('div');
         card.className = 'dash-card';
@@ -189,7 +196,11 @@ function renderMetrics(data) {
         if (item.trend) {
             const trend = document.createElement('span');
             trend.className = 'trend ' + item.trend.dir;
-            trend.innerHTML = '<i class="fa-solid ' + (item.trend.dir === 'up' ? 'fa-arrow-up' : 'fa-arrow-down') + '"></i> ' + item.trend.text;
+            const icon = document.createElement('i');
+            icon.className = 'fa-solid ' + (item.trend.dir === 'up' ? 'fa-arrow-up' : 'fa-arrow-down');
+            trend.appendChild(icon);
+            const trendText = document.createTextNode(' ' + item.trend.text);
+            trend.appendChild(trendText);
             top.appendChild(trend);
         }
 
@@ -220,8 +231,8 @@ function renderOrders(data) {
     const body = document.getElementById('ordersBody');
     const cards = document.getElementById('ordersCards');
     if (!body) return;
-    body.innerHTML = '';
-    if (cards) cards.innerHTML = '';
+    clearElement(body);
+    if (cards) clearElement(cards);
     if (data.orders.length === 0) {
         const empty = document.createElement('tr');
         const td = document.createElement('td');
@@ -238,22 +249,35 @@ function renderOrders(data) {
         return;
     }
     data.orders.forEach(function(order) {
+        const statusValue = (getOrderStatuses()[order.id] || order.status || 'Pending');
+
         const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${formatOrderId(order.id)}</td>
-            <td>${order.owner || 'Guest'}</td>
-            <td>
-                <select class="order-status" data-order="${order.id}">
-                    ${['Pending','Processing','Shipped','Completed','Cancelled'].map(function(st){
-                        const statusValue = (getOrderStatuses()[order.id] || order.status || 'Pending');
-                        const selected = statusValue === st ? 'selected' : '';
-                        return '<option '+selected+'>'+st+'</option>';
-                    }).join('')}
-                </select>
-            </td>
-            <td>${formatCurrency(order.total)}</td>
-            <td>${order.date.toLocaleDateString()}</td>
-        `;
+        const idTd = document.createElement('td');
+        idTd.textContent = formatOrderId(order.id);
+        const ownerTd = document.createElement('td');
+        ownerTd.textContent = order.owner || 'Guest';
+        const statusTd = document.createElement('td');
+        const select = document.createElement('select');
+        select.className = 'order-status';
+        select.setAttribute('data-order', order.id);
+        ['Pending','Processing','Shipped','Completed','Cancelled'].forEach(function(st) {
+            const opt = document.createElement('option');
+            opt.value = st;
+            opt.textContent = st;
+            if (statusValue === st) opt.selected = true;
+            select.appendChild(opt);
+        });
+        statusTd.appendChild(select);
+        const totalTd = document.createElement('td');
+        totalTd.textContent = formatCurrency(order.total);
+        const dateTd = document.createElement('td');
+        dateTd.textContent = order.date.toLocaleDateString();
+
+        row.appendChild(idTd);
+        row.appendChild(ownerTd);
+        row.appendChild(statusTd);
+        row.appendChild(totalTd);
+        row.appendChild(dateTd);
         body.appendChild(row);
 
         if (cards) {
@@ -262,33 +286,48 @@ function renderOrders(data) {
 
             const top = document.createElement('div');
             top.className = 'order-card__row';
-            top.innerHTML = `<strong>${formatOrderId(order.id)}</strong><span class="pill">${order.status || 'Pending'}</span>`;
+            const idLabel = document.createElement('strong');
+            idLabel.textContent = formatOrderId(order.id);
+            const statusPill = document.createElement('span');
+            statusPill.className = 'pill';
+            statusPill.textContent = order.status || 'Pending';
+            top.appendChild(idLabel);
+            top.appendChild(statusPill);
 
             const middle = document.createElement('div');
             middle.className = 'order-card__row muted';
-            middle.innerHTML = `<span>${order.owner || 'Guest'}</span><span>${order.date.toLocaleDateString()}</span>`;
+            const ownerSpan = document.createElement('span');
+            ownerSpan.textContent = order.owner || 'Guest';
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = order.date.toLocaleDateString();
+            middle.appendChild(ownerSpan);
+            middle.appendChild(dateSpan);
 
             const bottom = document.createElement('div');
             bottom.className = 'order-card__row';
-            bottom.innerHTML = `<span>Total</span><strong>${formatCurrency(order.total)}</strong>`;
+            const totalLabel = document.createElement('span');
+            totalLabel.textContent = 'Total';
+            const totalValue = document.createElement('strong');
+            totalValue.textContent = formatCurrency(order.total);
+            bottom.appendChild(totalLabel);
+            bottom.appendChild(totalValue);
 
             const statusWrap = document.createElement('div');
             statusWrap.className = 'order-card__row';
             const label = document.createElement('span');
             label.textContent = 'Status';
-            const select = document.createElement('select');
-            select.className = 'order-status';
-            select.setAttribute('data-order', order.id);
-            const statusValue = (getOrderStatuses()[order.id] || order.status || 'Pending');
+            const statusSelect = document.createElement('select');
+            statusSelect.className = 'order-status';
+            statusSelect.setAttribute('data-order', order.id);
             ['Pending','Processing','Shipped','Completed','Cancelled'].forEach(function(st) {
                 const opt = document.createElement('option');
                 opt.value = st;
                 opt.textContent = st;
                 if (statusValue === st) opt.selected = true;
-                select.appendChild(opt);
+                statusSelect.appendChild(opt);
             });
             statusWrap.appendChild(label);
-            statusWrap.appendChild(select);
+            statusWrap.appendChild(statusSelect);
 
             card.appendChild(top);
             card.appendChild(middle);
@@ -302,7 +341,7 @@ function renderOrders(data) {
 function renderTopProducts(data) {
     const list = document.getElementById('topProductsList');
     if (!list) return;
-    list.innerHTML = '';
+    clearElement(list);
     if (data.topProducts.length === 0) {
         const li = document.createElement('li');
         li.textContent = 'No product activity yet.';
@@ -333,7 +372,7 @@ function renderTopProducts(data) {
 function renderInventory(data) {
     const list = document.getElementById('inventoryList');
     if (!list) return;
-    list.innerHTML = '';
+    clearElement(list);
     if (!data.inventory.length) {
         const empty = document.createElement('li');
         empty.textContent = 'No inventory yet.';
@@ -344,7 +383,9 @@ function renderInventory(data) {
         const li = document.createElement('li');
         const left = document.createElement('div');
         const name = document.createElement('p');
-        name.innerHTML = '<strong>' + item.name + '</strong>';
+        const boldName = document.createElement('strong');
+        boldName.textContent = item.name;
+        name.appendChild(boldName);
         const sku = document.createElement('p');
         sku.className = 'muted';
         sku.textContent = 'SKU: ' + item.sku;
@@ -372,7 +413,7 @@ function renderAnalytics(data) {
     const meta = document.getElementById('chartMeta');
     const pill = document.getElementById('analyticsPill');
     if (cards) {
-        cards.innerHTML = '';
+        clearElement(cards);
         data.analytics.cards.forEach(function(item) {
             const card = document.createElement('div');
             card.className = 'analytics-card';
@@ -383,7 +424,10 @@ function renderAnalytics(data) {
             value.textContent = item.value;
             const trend = document.createElement('p');
             trend.className = 'trend ' + item.trend;
-            trend.innerHTML = '<i class="fa-solid ' + (item.trend === 'up' ? 'fa-arrow-up' : 'fa-arrow-down') + '"></i> ' + item.change;
+            const icon = document.createElement('i');
+            icon.className = 'fa-solid ' + (item.trend === 'up' ? 'fa-arrow-up' : 'fa-arrow-down');
+            trend.appendChild(icon);
+            trend.appendChild(document.createTextNode(' ' + item.change));
             card.appendChild(label);
             card.appendChild(value);
             card.appendChild(trend);
@@ -391,7 +435,7 @@ function renderAnalytics(data) {
         });
     }
     if (bars) {
-        bars.innerHTML = '';
+        clearElement(bars);
         const barValues = (data.analytics.totals || []).slice(0, 6);
         const heights = data.analytics.bars.slice(0, barValues.length || data.analytics.bars.length);
         heights.forEach(function(val, idx) {
@@ -427,7 +471,7 @@ function renderAnalytics(data) {
 function renderSettings(data) {
     const list = document.getElementById('settingsList');
     if (!list) return;
-    list.innerHTML = '';
+    clearElement(list);
     data.settings.forEach(function(item) {
         const label = document.createElement('label');
         label.className = 'setting-row';
@@ -568,7 +612,13 @@ function saveAdminProducts(list) {
 function populateCategorySelect(selectEl) {
     if (!selectEl) return;
     const categories = getUniqueCategories();
-    selectEl.innerHTML = '<option value="" disabled selected>Select category</option>';
+    clearElement(selectEl);
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.disabled = true;
+    defaultOpt.selected = true;
+    defaultOpt.textContent = 'Select category';
+    selectEl.appendChild(defaultOpt);
     categories.forEach(function(cat) {
         const opt = document.createElement('option');
         opt.value = cat;
@@ -639,7 +689,7 @@ function initProductForm() {
 function renderAdminProducts(list) {
     const wrapper = document.getElementById('adminProductsList');
     if (!wrapper) return;
-    wrapper.innerHTML = '';
+    clearElement(wrapper);
     if (!list.length) {
         wrapper.textContent = 'No products available.';
         return;
@@ -650,7 +700,21 @@ function renderAdminProducts(list) {
         const meta = document.createElement('div');
         meta.className = 'meta';
         const currentStock = getProductStock(p.id) || p.stock || 0;
-        meta.innerHTML = `<strong>${p.name}</strong><span class="muted">${p.category} • $${p.price}</span><span class="muted">Stock: ${currentStock}</span><span class="muted">${p.description || ''}</span>`;
+        const name = document.createElement('strong');
+        name.textContent = p.name;
+        const category = document.createElement('span');
+        category.className = 'muted';
+        category.textContent = (p.category || 'Item') + ' • $' + p.price;
+        const stock = document.createElement('span');
+        stock.className = 'muted';
+        stock.textContent = 'Stock: ' + currentStock;
+        const desc = document.createElement('span');
+        desc.className = 'muted';
+        desc.textContent = p.description || '';
+        meta.appendChild(name);
+        meta.appendChild(category);
+        meta.appendChild(stock);
+        meta.appendChild(desc);
         const actions = document.createElement('div');
         actions.className = 'actions';
         const editBtn = document.createElement('button');
@@ -907,13 +971,19 @@ function initInventoryManager() {
 function renderInventoryManagerList() {
     const container = document.getElementById('inventoryManageList');
     if (!container) return;
-    container.innerHTML = '';
+    clearElement(container);
     const inventory = buildInventorySnapshot();
     inventory.forEach(function(item) {
         const row = document.createElement('div');
         row.className = 'inventory-manage-row';
         const info = document.createElement('div');
-        info.innerHTML = `<strong>${item.name}</strong><p class="muted">${formatCategory(item.category)}</p>`;
+        const title = document.createElement('strong');
+        title.textContent = item.name;
+        const category = document.createElement('p');
+        category.className = 'muted';
+        category.textContent = formatCategory(item.category);
+        info.appendChild(title);
+        info.appendChild(category);
         const input = document.createElement('input');
         input.type = 'number';
         input.min = '0';

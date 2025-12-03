@@ -23,6 +23,13 @@ function getCartStorageKey() {
 
 let cart = JSON.parse(localStorage.getItem(getCartStorageKey())) || [];
 
+function clearElement(el) {
+    if (!el) return;
+    while (el.firstChild) {
+        el.removeChild(el.firstChild);
+    }
+}
+
 function getAvailableStock(productId) {
     const product = getProductById(productId);
     if (product && typeof product.stock === 'number') return product.stock;
@@ -41,8 +48,11 @@ function syncCartFromStorage() {
 
 function updateCartCount() {
     syncCartFromStorage();
-    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-    document.querySelectorAll('.cart-count').forEach(el => {
+    let count = 0;
+    for (let i = 0; i < cart.length; i++) {
+        count += cart[i].quantity;
+    }
+    document.querySelectorAll('.cart-count').forEach(function(el) {
         el.textContent = count;
     });
 }
@@ -140,7 +150,11 @@ function updateQuantity(productId, newQuantity) {
 }
 
 function getCartTotal() {
-    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    let total = 0;
+    for (let i = 0; i < cart.length; i++) {
+        total += cart[i].price * cart[i].quantity;
+    }
+    return total;
 }
 
 function getStoredOrders() {
@@ -162,7 +176,7 @@ function renderOrderHistory() {
         return !o.owner;
     });
 
-    body.innerHTML = '';
+    clearElement(body);
     if (!orders.length) {
         const empty = document.createElement('tr');
         const td = document.createElement('td');
@@ -228,7 +242,7 @@ function renderCart() {
     if (!cartContainer) return;
     
     if (cart.length === 0) {
-        cartContainer.innerHTML = '';
+        clearElement(cartContainer);
         const emptyRow = document.createElement('tr');
         const emptyTd = document.createElement('td');
         emptyTd.colSpan = 5;
@@ -253,7 +267,7 @@ function renderCart() {
         cartContainer.appendChild(emptyRow);
         
         if (cartSummary) {
-            cartSummary.innerHTML = '';
+            clearElement(cartSummary);
             cartSummary.appendChild(makeSummaryRow('Subtotal:', '$0.00'));
             cartSummary.appendChild(makeSummaryRow('Shipping:', '$0.00'));
             cartSummary.appendChild(makeSummaryRow('Total:', '$0.00', true));
@@ -261,7 +275,7 @@ function renderCart() {
         return;
     }
 
-    cartContainer.innerHTML = '';
+    clearElement(cartContainer);
     for (let i = 0; i < cart.length; i++) {
         const item = cart[i];
         const lineTotal = (item.price * item.quantity).toFixed(2);
@@ -338,7 +352,9 @@ function renderCart() {
         const removeSpan = document.createElement('span');
         removeSpan.className = 'remove-item';
         removeSpan.title = 'Remove';
-        removeSpan.innerHTML = '<i class="fas fa-trash"></i>';
+        const trashIcon = document.createElement('i');
+        trashIcon.className = 'fas fa-trash';
+        removeSpan.appendChild(trashIcon);
         removeSpan.addEventListener('click', function() {
             removeFromCart(item.id);
         });
@@ -353,7 +369,7 @@ function renderCart() {
         const shipping = subtotal > 0 ? 10.00 : 0;
         const total = subtotal + shipping;
         
-        cartSummary.innerHTML = '';
+        clearElement(cartSummary);
         cartSummary.appendChild(makeSummaryRow('Subtotal:', '$' + subtotal.toFixed(2)));
         cartSummary.appendChild(makeSummaryRow('Shipping:', '$' + shipping.toFixed(2)));
         cartSummary.appendChild(makeSummaryRow('Total:', '$' + total.toFixed(2), true));
