@@ -1,3 +1,8 @@
+document.addEventListener("DOMContentLoaded", () => {
+    const yearSpan = document.getElementById("year");
+    yearSpan.textContent = new Date().getFullYear();
+});
+
 
 document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.querySelector('.hamburger');
