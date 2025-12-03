@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
 
     <nav class="navbar">
@@ -36,7 +38,8 @@
                             <button type="button" class="logout-btn">Logout</button>
                         </div>
                         <div class="user-guest">
-                            <a href="login.html" class="login-link"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+                            <a href="login.html" class="login-link"><i class="fa-solid fa-arrow-right-to-bracket"></i>
+                                Login</a>
                             <a href="signup.html" class="signup-link"><i class="fa-solid fa-user-plus"></i> Sign Up</a>
                         </div>
                     </div>
@@ -61,7 +64,7 @@
 
     <section class="cart-container">
         <div class="container">
-           
+
             <table class="cart-table">
                 <thead>
                     <tr>
@@ -73,7 +76,7 @@
                     </tr>
                 </thead>
                 <tbody id="cartItems">
-             
+
                 </tbody>
             </table>
 
@@ -103,7 +106,8 @@
         <div class="checkout-modal-content">
             <button class="checkout-modal-close" onclick="closeCheckoutModal()">&times;</button>
             <h3 style="margin-bottom: 10px;">Secure Checkout</h3>
-            <p style="margin-bottom: 20px;">Enter your details to finalize delivery. Your cart total is <strong>$<span id="checkoutDue">0.00</span></strong>.</p>
+            <p style="margin-bottom: 20px;">Enter your details to finalize delivery. Your cart total is <strong>$<span
+                        id="checkoutDue">0.00</span></strong>.</p>
             <form id="checkoutForm" onsubmit="handleCheckoutSubmit(event)">
                 <div class="checkout-form-grid">
                     <div class="form-group">
@@ -144,7 +148,7 @@
                     <h3>Zay Shop</h3>
                     <div class="footer-info">
                         <p><i class="fas fa-map-marker-alt"></i> 266 Pristina Hasan Prishtina 2000</p>
-                        <p><i class="fas fa-phone"></i> Number: 048-286-038-049-841-813</p>
+                        <p><i class="fas fa-phone"></i> Number: 048286038-049841813</p>
                         <p><i class="fas fa-envelope"></i> info@e-zay.com</p>
                     </div>
                 </div>
@@ -170,7 +174,7 @@
             <div class="footer-bottom">
                 <p>&copy; <span id="year"></span> Zay Shop. All rights reserved.</p>
             </div>
-            
+
         </div>
     </footer>
 
@@ -193,5 +197,5 @@
     <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/main.js"></script>
 </body>
-</html>
 
+</html>

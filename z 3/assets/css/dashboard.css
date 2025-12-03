@@ -28,7 +28,7 @@ body {
 
 .dash-brand span {
     display: block;
-    color: rgba(255,255,255,0.6);
+    color: rgba(255, 255, 255, 0.6);
     margin-top: 4px;
     font-size: 13px;
     letter-spacing: 1px;
@@ -42,7 +42,7 @@ body {
 }
 
 .dash-nav a {
-    color: rgba(255,255,255,0.8);
+    color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     padding: 12px 14px;
     border-radius: 10px;
@@ -55,7 +55,7 @@ body {
 
 .dash-nav a.active,
 .dash-nav a:hover {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     color: var(--bg-white);
 }
 
@@ -139,7 +139,7 @@ body {
     padding: 18px;
     border-radius: 14px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 10px 25px rgba(15,23,42,0.08);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
 }
 
 .card-top {
@@ -186,7 +186,7 @@ body {
     padding: 18px;
     border-radius: 14px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 8px 20px rgba(15,23,42,0.06);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
 }
 
 .dash-divider {
@@ -219,7 +219,7 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-.dash-table tr + tr td {
+.dash-table tr+tr td {
     border-top: 1px solid var(--border-color);
 }
 
@@ -339,7 +339,7 @@ button.link-muted {
     width: min(680px, 92vw);
     max-height: 80vh;
     overflow: auto;
-    box-shadow: 0 20px 60px rgba(15,23,42,0.25);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
 }
 
 .inventory-modal__head {
@@ -558,7 +558,7 @@ body.modal-open {
     position: relative;
     cursor: pointer;
     transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-    box-shadow: inset 0 1px 2px rgba(15,23,42,0.08);
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 .setting-row input[type="checkbox"]::after {
@@ -570,14 +570,14 @@ body.modal-open {
     height: 20px;
     border-radius: 50%;
     background: var(--bg-white);
-    box-shadow: 0 2px 6px rgba(15,23,42,0.15);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
     transition: transform 0.2s;
 }
 
 .setting-row input[type="checkbox"]:checked {
     border-color: var(--primary-color);
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    box-shadow: 0 6px 14px rgba(34,197,94,0.25);
+    box-shadow: 0 6px 14px rgba(34, 197, 94, 0.25);
 }
 
 .setting-row input[type="checkbox"]:checked::after {
@@ -585,7 +585,7 @@ body.modal-open {
 }
 
 .setting-row input[type="checkbox"]:focus {
-    outline: 2px solid rgba(59,130,246,0.35);
+    outline: 2px solid rgba(59, 130, 246, 0.35);
     outline-offset: 2px;
 }
 
@@ -645,7 +645,7 @@ body.modal-open {
 }
 
 .order-status:focus {
-    outline: 2px solid rgba(59,130,246,0.3);
+    outline: 2px solid rgba(59, 130, 246, 0.3);
     outline-offset: 1px;
 }
 
@@ -665,7 +665,7 @@ body.modal-open {
         width: 260px;
         transform: translateX(-100%);
         transition: transform 0.25s ease;
-        box-shadow: 12px 0 20px rgba(15,23,42,0.2);
+        box-shadow: 12px 0 20px rgba(15, 23, 42, 0.2);
         flex-direction: column;
         justify-content: flex-start;
         overflow-y: auto;

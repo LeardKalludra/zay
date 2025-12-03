@@ -52,7 +52,7 @@ function updateCartCount() {
     for (let i = 0; i < cart.length; i++) {
         count += cart[i].quantity;
     }
-    document.querySelectorAll('.cart-count').forEach(function(el) {
+    document.querySelectorAll('.cart-count').forEach(function (el) {
         el.textContent = count;
     });
 }
@@ -75,7 +75,7 @@ function addToCart(productId) {
     }
 
     const existingItem = cart.find(item => item.id === product.id);
-    
+
     if (existingItem) {
         const nextQty = existingItem.quantity + 1;
         if (nextQty > available) {
@@ -93,15 +93,15 @@ function addToCart(productId) {
             quantity: 1
         });
     }
-    
+
     saveCart();
     updateCartCount();
     showNotification('Product added to cart!');
-    
+
     if (window.location.pathname.includes('cart.html')) {
         renderCart();
     }
-    
+
     if (typeof window.updateFloatingCartOnChange === 'function') {
         window.updateFloatingCartOnChange();
     }
@@ -114,7 +114,7 @@ function removeFromCart(productId) {
     updateCartCount();
     renderCart();
     showNotification('Product removed from cart!');
-    
+
     if (typeof window.updateFloatingCartOnChange === 'function') {
         window.updateFloatingCartOnChange();
     }
@@ -141,7 +141,7 @@ function updateQuantity(productId, newQuantity) {
             saveCart();
             updateCartCount();
             renderCart();
-            
+
             if (typeof window.updateFloatingCartOnChange === 'function') {
                 window.updateFloatingCartOnChange();
             }
@@ -238,9 +238,9 @@ function renderCart() {
     syncCartFromStorage();
     const cartContainer = document.getElementById('cartItems');
     const cartSummary = document.getElementById('cartSummary');
-    
+
     if (!cartContainer) return;
-    
+
     if (cart.length === 0) {
         clearElement(cartContainer);
         const emptyRow = document.createElement('tr');
@@ -265,7 +265,7 @@ function renderCart() {
         emptyTd.appendChild(shopLink);
         emptyRow.appendChild(emptyTd);
         cartContainer.appendChild(emptyRow);
-        
+
         if (cartSummary) {
             clearElement(cartSummary);
             cartSummary.appendChild(makeSummaryRow('Subtotal:', '$0.00'));
@@ -318,7 +318,7 @@ function renderCart() {
         const minusBtn = document.createElement('button');
         minusBtn.className = 'quantity-btn';
         minusBtn.textContent = '-';
-        minusBtn.addEventListener('click', function() {
+        minusBtn.addEventListener('click', function () {
             updateQuantity(item.id, item.quantity - 1);
         });
 
@@ -327,14 +327,14 @@ function renderCart() {
         qtyInput.className = 'quantity-input';
         qtyInput.value = item.quantity;
         qtyInput.min = 1;
-        qtyInput.addEventListener('change', function() {
+        qtyInput.addEventListener('change', function () {
             updateQuantity(item.id, this.value);
         });
 
         const plusBtn = document.createElement('button');
         plusBtn.className = 'quantity-btn';
         plusBtn.textContent = '+';
-        plusBtn.addEventListener('click', function() {
+        plusBtn.addEventListener('click', function () {
             updateQuantity(item.id, item.quantity + 1);
         });
 
@@ -355,7 +355,7 @@ function renderCart() {
         const trashIcon = document.createElement('i');
         trashIcon.className = 'fas fa-trash';
         removeSpan.appendChild(trashIcon);
-        removeSpan.addEventListener('click', function() {
+        removeSpan.addEventListener('click', function () {
             removeFromCart(item.id);
         });
         removeTd.appendChild(removeSpan);
@@ -363,12 +363,12 @@ function renderCart() {
 
         cartContainer.appendChild(row);
     }
-    
+
     if (cartSummary) {
         const subtotal = getCartTotal();
         const shipping = subtotal > 0 ? 10.00 : 0;
         const total = subtotal + shipping;
-        
+
         clearElement(cartSummary);
         cartSummary.appendChild(makeSummaryRow('Subtotal:', '$' + subtotal.toFixed(2)));
         cartSummary.appendChild(makeSummaryRow('Shipping:', '$' + shipping.toFixed(2)));
@@ -402,7 +402,7 @@ function checkout() {
         alert('Your cart is empty!');
         return;
     }
-    
+
     if (openCheckoutModal()) {
         return;
     }
@@ -420,21 +420,21 @@ function checkout() {
 function openCheckoutModal() {
     const modal = document.getElementById('checkoutModal');
     if (!modal) return false;
-    
+
     const form = document.getElementById('checkoutForm');
     if (form) form.reset();
-    
+
     const confirmation = document.getElementById('checkoutConfirmation');
     if (confirmation) {
         confirmation.style.display = 'none';
         confirmation.textContent = '';
     }
-    
+
     const dueEl = document.getElementById('checkoutDue');
     if (dueEl) {
         dueEl.textContent = getCartTotal().toFixed(2);
     }
-    
+
     modal.classList.add('active');
     document.body.classList.add('modal-open');
     return true;
@@ -452,7 +452,7 @@ function handleCheckoutSubmit(event) {
     const nameInput = document.getElementById('checkoutName');
     const emailInput = document.getElementById('checkoutEmail');
     const confirmation = document.getElementById('checkoutConfirmation');
-    
+
     if (confirmation) {
         const name = nameInput?.value || 'friend';
         confirmation.textContent = `Thanks ${name}! A confirmation email is on its way to ${emailInput?.value}.`;
@@ -466,7 +466,7 @@ function handleCheckoutSubmit(event) {
     updateCartCount();
     renderCart();
     renderOrderHistory();
-    
+
     setTimeout(() => {
         closeCheckoutModal();
     }, 1800);
@@ -487,7 +487,7 @@ document.addEventListener('click', (event) => {
 function applyInventoryDeduction(items) {
     if (!items || !items.length || typeof getInventoryMap !== 'function' || typeof saveInventoryMap !== 'function') return;
     const inventory = getInventoryMap();
-    items.forEach(function(item) {
+    items.forEach(function (item) {
         const current = inventory[item.id] !== undefined ? inventory[item.id] : getAvailableStock(item.id);
         inventory[item.id] = Math.max(0, (current || 0) - item.quantity);
     });
@@ -510,7 +510,7 @@ function showNotification(message) {
     `;
     notification.textContent = message;
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s';
         setTimeout(() => notification.remove(), 300);
@@ -539,7 +539,7 @@ if (document.readyState === 'loading') {
     }
 }
 
-window.updateFloatingCartOnChange = function() {
+window.updateFloatingCartOnChange = function () {
     if (typeof updateFloatingCart === 'function') {
         setTimeout(updateFloatingCart, 100);
     }

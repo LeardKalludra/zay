@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const data = collectDashboardData();
     renderMetrics(data);
     renderOrders(data);
@@ -33,28 +33,28 @@ function collectDashboardData() {
     }
 
     const orderSource = ordersHistory.length ? ordersHistory : carts;
-    const sortedOrders = orderSource.slice().sort(function(a, b) {
+    const sortedOrders = orderSource.slice().sort(function (a, b) {
         const aDate = a.date ? new Date(a.date).getTime() : 0;
         const bDate = b.date ? new Date(b.date).getTime() : 0;
         return bDate - aDate;
     });
 
-    const totalRevenue = sortedOrders.reduce(function(sum, cart) {
+    const totalRevenue = sortedOrders.reduce(function (sum, cart) {
         return sum + cart.total;
     }, 0);
-    const ordersCount = sortedOrders.filter(function(c) { return c.items.length > 0; }).length;
-    const activeUsers = carts.filter(function(c) { return c.items.length > 0 && c.owner; }).length;
+    const ordersCount = sortedOrders.filter(function (c) { return c.items.length > 0; }).length;
+    const activeUsers = carts.filter(function (c) { return c.items.length > 0 && c.owner; }).length;
     const avgOrder = ordersCount ? totalRevenue / ordersCount : 0;
     const activeCartsTotal = carts
-        .filter(function(c) { return c.items.length > 0; })
-        .reduce(function(sum, cart) { return sum + cart.total; }, 0);
+        .filter(function (c) { return c.items.length > 0; })
+        .reduce(function (sum, cart) { return sum + cart.total; }, 0);
     const orderSalesTotal = ordersHistory.length
-        ? ordersHistory.reduce(function(sum, order) { return sum + (order.total || 0); }, 0)
+        ? ordersHistory.reduce(function (sum, order) { return sum + (order.total || 0); }, 0)
         : totalRevenue;
 
     const productSales = {};
-    carts.forEach(function(cart) {
-        cart.items.forEach(function(item) {
+    carts.forEach(function (cart) {
+        cart.items.forEach(function (item) {
             if (!productSales[item.id]) {
                 productSales[item.id] = { ...item, sold: 0 };
             }
@@ -63,18 +63,18 @@ function collectDashboardData() {
     });
 
     const topProducts = Object.values(productSales)
-        .sort(function(a, b) { return b.sold - a.sold; })
+        .sort(function (a, b) { return b.sold - a.sold; })
         .slice(0, 3);
 
     const inventory = buildInventorySnapshot();
 
-    const itemsSold = sortedOrders.reduce(function(sum, order) {
-        const itemTotal = (order.items || []).reduce(function(s, i) { return s + (i.quantity || 0); }, 0);
+    const itemsSold = sortedOrders.reduce(function (sum, order) {
+        const itemTotal = (order.items || []).reduce(function (s, i) { return s + (i.quantity || 0); }, 0);
         return sum + itemTotal;
     }, 0);
     const conversionBase = carts.length || sortedOrders.length;
     const conversionRate = conversionBase ? Math.round((ordersCount / Math.max(conversionBase, 1)) * 100) : 0;
-    const barTotals = sortedOrders.length ? sortedOrders.map(function(o){ return o.total; }) : carts.map(function(c){ return c.total; });
+    const barTotals = sortedOrders.length ? sortedOrders.map(function (o) { return o.total; }) : carts.map(function (c) { return c.total; });
 
     return {
         users: users,
@@ -111,7 +111,7 @@ function collectCarts() {
                 const stored = JSON.parse(localStorage.getItem(key)) || [];
                 const ownerKey = key.replace('cart_', '');
                 const owner = ownerKey === 'guest' ? null : decodeURIComponent(ownerKey);
-                const total = stored.reduce(function(sum, item) { return sum + (item.price * item.quantity); }, 0);
+                const total = stored.reduce(function (sum, item) { return sum + (item.price * item.quantity); }, 0);
                 const date = new Date(parseInt(localStorage.getItem(key + '_updated') || Date.now(), 10));
                 const status = getOrderStatuses()[key] || (stored.length ? 'Pending' : 'Empty');
                 carts.push({ id: key, owner: owner, items: stored, total: total, date: date, status: status });
@@ -120,13 +120,13 @@ function collectCarts() {
             }
         }
     }
-    return carts.sort(function(a, b) { return b.total - a.total; });
+    return carts.sort(function (a, b) { return b.total - a.total; });
 }
 
 function getOrders() {
     try {
         const stored = JSON.parse(localStorage.getItem('orders')) || [];
-        return stored.map(function(order) {
+        return stored.map(function (order) {
             return {
                 id: order.id,
                 owner: order.owner,
@@ -142,7 +142,7 @@ function getOrders() {
 }
 
 function buildSampleData() {
-    let baseProducts = (typeof products !== 'undefined' ? products.slice(0, 4) : []).map(function(p) {
+    let baseProducts = (typeof products !== 'undefined' ? products.slice(0, 4) : []).map(function (p) {
         return {
             id: p.id,
             name: p.name,
@@ -175,14 +175,14 @@ function buildSampleData() {
 }
 
 function sumItems(items) {
-    return items.reduce(function(sum, item) { return sum + (item.price * item.quantity); }, 0);
+    return items.reduce(function (sum, item) { return sum + (item.price * item.quantity); }, 0);
 }
 
 function renderMetrics(data) {
     const container = document.getElementById('metricsContainer');
     if (!container) return;
     clearElement(container);
-    data.metrics.forEach(function(item) {
+    data.metrics.forEach(function (item) {
         const card = document.createElement('div');
         card.className = 'dash-card';
 
@@ -248,7 +248,7 @@ function renderOrders(data) {
         }
         return;
     }
-    data.orders.forEach(function(order) {
+    data.orders.forEach(function (order) {
         const statusValue = (getOrderStatuses()[order.id] || order.status || 'Pending');
 
         const row = document.createElement('tr');
@@ -260,7 +260,7 @@ function renderOrders(data) {
         const select = document.createElement('select');
         select.className = 'order-status';
         select.setAttribute('data-order', order.id);
-        ['Pending','Processing','Shipped','Completed','Cancelled'].forEach(function(st) {
+        ['Pending', 'Processing', 'Shipped', 'Completed', 'Cancelled'].forEach(function (st) {
             const opt = document.createElement('option');
             opt.value = st;
             opt.textContent = st;
@@ -319,7 +319,7 @@ function renderOrders(data) {
             const statusSelect = document.createElement('select');
             statusSelect.className = 'order-status';
             statusSelect.setAttribute('data-order', order.id);
-            ['Pending','Processing','Shipped','Completed','Cancelled'].forEach(function(st) {
+            ['Pending', 'Processing', 'Shipped', 'Completed', 'Cancelled'].forEach(function (st) {
                 const opt = document.createElement('option');
                 opt.value = st;
                 opt.textContent = st;
@@ -348,7 +348,7 @@ function renderTopProducts(data) {
         list.appendChild(li);
         return;
     }
-    data.topProducts.forEach(function(item) {
+    data.topProducts.forEach(function (item) {
         const li = document.createElement('li');
         const left = document.createElement('div');
         const title = document.createElement('strong');
@@ -379,7 +379,7 @@ function renderInventory(data) {
         list.appendChild(empty);
         return;
     }
-    data.inventory.forEach(function(item) {
+    data.inventory.forEach(function (item) {
         const li = document.createElement('li');
         const left = document.createElement('div');
         const name = document.createElement('p');
@@ -414,7 +414,7 @@ function renderAnalytics(data) {
     const pill = document.getElementById('analyticsPill');
     if (cards) {
         clearElement(cards);
-        data.analytics.cards.forEach(function(item) {
+        data.analytics.cards.forEach(function (item) {
             const card = document.createElement('div');
             card.className = 'analytics-card';
             const label = document.createElement('p');
@@ -438,7 +438,7 @@ function renderAnalytics(data) {
         clearElement(bars);
         const barValues = (data.analytics.totals || []).slice(0, 6);
         const heights = data.analytics.bars.slice(0, barValues.length || data.analytics.bars.length);
-        heights.forEach(function(val, idx) {
+        heights.forEach(function (val, idx) {
             const bar = document.createElement('span');
             bar.style.height = val + '%';
             const amount = barValues[idx] !== undefined ? barValues[idx] : 0;
@@ -456,7 +456,7 @@ function renderAnalytics(data) {
         const totals = data.analytics.totals || [];
         if (totals.length) {
             const max = Math.max.apply(null, totals);
-            const avg = totals.reduce(function(sum, v){ return sum + v; }, 0) / totals.length;
+            const avg = totals.reduce(function (sum, v) { return sum + v; }, 0) / totals.length;
             meta.textContent = 'Peak ' + formatCurrency(max) + ' • Avg ' + formatCurrency(avg);
         } else {
             meta.textContent = 'No order history yet.';
@@ -472,7 +472,7 @@ function renderSettings(data) {
     const list = document.getElementById('settingsList');
     if (!list) return;
     clearElement(list);
-    data.settings.forEach(function(item) {
+    data.settings.forEach(function (item) {
         const label = document.createElement('label');
         label.className = 'setting-row';
 
@@ -488,7 +488,7 @@ function renderSettings(data) {
         const toggle = document.createElement('input');
         toggle.type = 'checkbox';
         toggle.checked = !!item.checked;
-        toggle.addEventListener('change', function() {
+        toggle.addEventListener('change', function () {
             persistSetting(item.label, toggle.checked);
         });
 
@@ -520,7 +520,7 @@ function formatOrderId(id) {
 function buildBarHeights(totals) {
     if (!totals || !totals.length) return [10, 12, 8, 6, 9, 7];
     const max = Math.max.apply(null, totals);
-    return totals.slice(0, 6).map(function(val) {
+    return totals.slice(0, 6).map(function (val) {
         return max ? Math.round((val / max) * 90) + 10 : 10;
     });
 }
@@ -544,7 +544,7 @@ function saveOrders(list) {
 function attachStatusHandlers() {
     const body = document.getElementById('ordersBody');
     if (!body) return;
-    body.addEventListener('change', function(e) {
+    body.addEventListener('change', function (e) {
         if (e.target && e.target.classList.contains('order-status')) {
             const id = e.target.getAttribute('data-order');
             const statuses = getOrderStatuses();
@@ -552,7 +552,7 @@ function attachStatusHandlers() {
             saveOrderStatuses(statuses);
 
             const stored = getOrders();
-            const updated = stored.map(function(o) {
+            const updated = stored.map(function (o) {
                 if (o.id === id) {
                     return { ...o, status: e.target.value };
                 }
@@ -569,7 +569,7 @@ function mergeSettings(stored) {
         { label: 'Low stock alerts', desc: 'Email when inventory < 10', checked: true },
         { label: 'Order notifications', desc: 'Push updates to admin email', checked: true }
     ];
-    return defaults.map(function(item) {
+    return defaults.map(function (item) {
         if (stored[item.label] !== undefined) {
             return { ...item, checked: stored[item.label] };
         }
@@ -619,7 +619,7 @@ function populateCategorySelect(selectEl) {
     defaultOpt.selected = true;
     defaultOpt.textContent = 'Select category';
     selectEl.appendChild(defaultOpt);
-    categories.forEach(function(cat) {
+    categories.forEach(function (cat) {
         const opt = document.createElement('option');
         opt.value = cat;
         opt.textContent = formatCategory(cat);
@@ -630,7 +630,7 @@ function populateCategorySelect(selectEl) {
 function getUniqueCategories() {
     const all = getAllProductData();
     const set = new Set();
-    all.forEach(function(p) {
+    all.forEach(function (p) {
         if (p.category) set.add(p.category);
     });
     return Array.from(set);
@@ -647,7 +647,7 @@ function initProductForm() {
     const quantityInput = document.getElementById('productQuantity');
     if (!form) return;
     populateCategorySelect(categorySelect);
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         e.preventDefault();
         const name = document.getElementById('productName').value.trim();
         const price = parseFloat(document.getElementById('productPrice').value);
@@ -694,7 +694,7 @@ function renderAdminProducts(list) {
         wrapper.textContent = 'No products available.';
         return;
     }
-    list.forEach(function(p) {
+    list.forEach(function (p) {
         const row = document.createElement('div');
         row.className = 'product-row';
         const meta = document.createElement('div');
@@ -719,12 +719,12 @@ function renderAdminProducts(list) {
         actions.className = 'actions';
         const editBtn = document.createElement('button');
         editBtn.textContent = 'Edit';
-        editBtn.addEventListener('click', function() {
+        editBtn.addEventListener('click', function () {
             openProductEditModal(p.id);
         });
         const removeBtn = document.createElement('button');
         removeBtn.textContent = 'Delete';
-        removeBtn.addEventListener('click', function() {
+        removeBtn.addEventListener('click', function () {
             removeProductEverywhere(p.id);
             const data = collectDashboardData();
             renderTopProducts(data);
@@ -755,10 +755,10 @@ function initSections() {
     const sections = document.querySelectorAll('.dash-section');
 
     function showSection(name) {
-        navLinks.forEach(function(link) {
+        navLinks.forEach(function (link) {
             link.classList.toggle('active', link.getAttribute('data-section') === name);
         });
-        sections.forEach(function(sec) {
+        sections.forEach(function (sec) {
             const match = sec.getAttribute('data-section') === name;
             if (match) {
                 sec.classList.remove('hidden');
@@ -768,8 +768,8 @@ function initSections() {
         });
     }
 
-    navLinks.forEach(function(link) {
-        link.addEventListener('click', function(e) {
+    navLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
             e.preventDefault();
             const name = this.getAttribute('data-section');
             if (name) showSection(name);
@@ -789,12 +789,12 @@ function removeProductEverywhere(productId) {
         saveRemovedProductIds(removed);
     }
 
-    const updatedAdmin = getAdminProducts().filter(function(p) { return p.id !== numericId; });
+    const updatedAdmin = getAdminProducts().filter(function (p) { return p.id !== numericId; });
     saveAdminProducts(updatedAdmin);
 
     try {
         const stored = JSON.parse(localStorage.getItem('products')) || [];
-        const filteredStored = stored.filter(function(p) { return p.id !== numericId; });
+        const filteredStored = stored.filter(function (p) { return p.id !== numericId; });
         localStorage.setItem('products', JSON.stringify(filteredStored));
     } catch (e) {
     }
@@ -814,15 +814,15 @@ function initProductEditModal() {
     const closeEls = document.querySelectorAll('[data-close-product]');
     if (!modal || !form) return;
 
-    closeEls.forEach(function(btn) {
+    closeEls.forEach(function (btn) {
         btn.addEventListener('click', closeProductEditModal);
     });
 
-    modal.addEventListener('click', function(e) {
+    modal.addEventListener('click', function (e) {
         if (e.target === modal) closeProductEditModal();
     });
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         e.preventDefault();
         const id = parseInt(document.getElementById('productEditId').value, 10);
         const name = document.getElementById('productEditName').value.trim();
@@ -847,7 +847,7 @@ function initProductEditModal() {
 function openProductEditModal(productId) {
     const modal = document.getElementById('productEditModal');
     if (!modal) return;
-    const product = getDynamicProducts().find(function(p) { return p.id === productId; });
+    const product = getDynamicProducts().find(function (p) { return p.id === productId; });
     if (!product) return;
     document.getElementById('productEditId').value = product.id;
     document.getElementById('productEditName').value = product.name || '';
@@ -884,8 +884,8 @@ function persistProductOverride(id, override) {
 }
 
 function updateStoredProductRecords(id, override) {
-    const updateList = function(list) {
-        return list.map(function(item) {
+    const updateList = function (list) {
+        return list.map(function (item) {
             if (item.id === id) {
                 return { ...item, ...override };
             }
@@ -899,12 +899,12 @@ function updateStoredProductRecords(id, override) {
     try {
         const stored = JSON.parse(localStorage.getItem('products')) || [];
         localStorage.setItem('products', JSON.stringify(updateList(stored)));
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function buildInventorySnapshot() {
     const allProducts = getDynamicProducts();
-    return allProducts.map(function(p) {
+    return allProducts.map(function (p) {
         const stock = typeof p.stock === 'number' ? p.stock : getProductStock(p.id);
         const statusMeta = inventoryStatus(stock);
         return {
@@ -916,7 +916,7 @@ function buildInventorySnapshot() {
             tone: statusMeta.tone,
             status: statusMeta.text
         };
-    }).sort(function(a, b) {
+    }).sort(function (a, b) {
         return a.name.localeCompare(b.name);
     });
 }
@@ -935,22 +935,22 @@ function initInventoryManager() {
     const saveBtn = document.getElementById('inventorySaveBtn');
     if (!manageBtn || !modal) return;
 
-    manageBtn.addEventListener('click', function(e) {
+    manageBtn.addEventListener('click', function (e) {
         e.preventDefault();
         renderInventoryManagerList();
         modal.classList.add('active');
         document.body.classList.add('modal-open');
     });
 
-    closeBtns.forEach(function(btn) {
+    closeBtns.forEach(function (btn) {
         btn.addEventListener('click', closeInventoryModal);
     });
 
     if (saveBtn) {
-        saveBtn.addEventListener('click', function() {
+        saveBtn.addEventListener('click', function () {
             const inputs = modal.querySelectorAll('input[data-product]');
             const inventory = getInventoryMap();
-            inputs.forEach(function(input) {
+            inputs.forEach(function (input) {
                 const id = parseInt(input.getAttribute('data-product'), 10);
                 const qty = Math.max(0, parseInt(input.value, 10) || 0);
                 inventory[id] = qty;
@@ -963,7 +963,7 @@ function initInventoryManager() {
         });
     }
 
-    modal.addEventListener('click', function(e) {
+    modal.addEventListener('click', function (e) {
         if (e.target === modal) closeInventoryModal();
     });
 }
@@ -973,7 +973,7 @@ function renderInventoryManagerList() {
     if (!container) return;
     clearElement(container);
     const inventory = buildInventorySnapshot();
-    inventory.forEach(function(item) {
+    inventory.forEach(function (item) {
         const row = document.createElement('div');
         row.className = 'inventory-manage-row';
         const info = document.createElement('div');
@@ -1001,3 +1001,44 @@ function closeInventoryModal() {
     modal.classList.remove('active');
     document.body.classList.remove('modal-open');
 }
+
+
+const user = getAuthenticatedUser();
+if (!user || user.role !== 'admin') {
+    window.location.href = 'login.html';
+}
+
+document.getElementById('logoutBtn').addEventListener('click', function () {
+    logout();
+});
+
+const navLinks = document.querySelectorAll('.dash-nav a');
+const shell = document.querySelector('.dashboard-shell');
+const toggleBtn = document.getElementById('sidebarToggle');
+
+navLinks.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+        const targetId = this.getAttribute('href');
+        if (targetId && targetId.startsWith('#')) {
+            e.preventDefault();
+            document.querySelector(targetId)?.scrollIntoView({ behavior: 'smooth' });
+            navLinks.forEach(function (l) { l.classList.remove('active'); });
+            this.classList.add('active');
+        }
+        if (window.innerWidth <= 900 && shell) {
+            shell.classList.remove('sidebar-open');
+        }
+    });
+});
+
+if (toggleBtn && shell) {
+    toggleBtn.addEventListener('click', function () {
+        shell.classList.toggle('sidebar-open');
+    });
+}
+
+window.addEventListener('resize', function () {
+    if (window.innerWidth > 900 && shell) {
+        shell.classList.remove('sidebar-open');
+    }
+});
