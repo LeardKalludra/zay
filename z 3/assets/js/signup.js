@@ -8,7 +8,7 @@ const users = JSON.parse(localStorage.getItem("users")) || [];
 
 const user = getAuthenticatedUser();
 
-if(user) {
+if (user) {
     window.location.href = "index.html"
 }
 
@@ -30,39 +30,39 @@ function validateEmail(emailValue) {
 }
 
 
-form.addEventListener("submit",(e) => {
+form.addEventListener("submit", (e) => {
     e.preventDefault();
 
     let valid = true;
 
-    if(fullname.value.trim().length < 3) {
-        setError(fullname,"Enter at least 3 characters.");
+    if (fullname.value.trim().length < 3) {
+        setError(fullname, "Enter at least 3 characters.");
         valid = false;
-    }else {
+    } else {
         setSuccess(fullname)
     }
 
-    
-    if(!validateEmail(email.value.trim())) {
-        setError(email,"Enter a valid email");
+
+    if (!validateEmail(email.value.trim())) {
+        setError(email, "Enter a valid email");
         valid = false;
-    }else {
+    } else {
         setSuccess(email);
     }
 
-    
-    if(password.value.trim().length < 6) {
-        setError(password,"Password must be 6+ characters");
+
+    if (password.value.trim().length < 6) {
+        setError(password, "Password must be 6+ characters");
         valid = false;
-    }else {
+    } else {
         setSuccess(password);
     }
 
 
-    if(confirmPassword.value.trim() !== password.value.trim()) {
-        setError(confirmPassword,"Password do not match");
+    if (confirmPassword.value.trim() !== password.value.trim()) {
+        setError(confirmPassword, "Password do not match");
         valid = false;
-    }else {
+    } else {
         setSuccess(confirmPassword);
     }
 
@@ -73,17 +73,17 @@ form.addEventListener("submit",(e) => {
     }
 
 
-    if(valid) {
+    if (valid) {
         users.push({
             fullname: fullname.value,
             email: email.value,
             password: password.value,
-            role:"user"
-    })
-    window.location.href = "login.html"
+            role: "user"
+        })
+        window.location.href = "login.html"
 
     }
 
-    localStorage.setItem("users",JSON.stringify(users))
+    localStorage.setItem("users", JSON.stringify(users))
 
 })

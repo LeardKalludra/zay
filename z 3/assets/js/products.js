@@ -267,7 +267,7 @@ function getProductsByCategory(category) {
 function searchProducts(query) {
     if (!query) return [];
     const lowerQuery = query.toLowerCase();
-    return getDynamicProducts().filter(product => 
+    return getDynamicProducts().filter(product =>
         product.name.toLowerCase().includes(lowerQuery) ||
         product.description.toLowerCase().includes(lowerQuery) ||
         product.category.toLowerCase().includes(lowerQuery)
@@ -286,12 +286,12 @@ function getDynamicProducts() {
         for (let i = 0; i < extra.length; i++) {
             const p = extra[i];
             if (!p || !p.id) continue;
-            const exists = combined.some(function(item) { return item.id === p.id; });
+            const exists = combined.some(function (item) { return item.id === p.id; });
             if (!exists) combined.push(p);
         }
-    } catch (e) {}
+    } catch (e) { }
     const removed = getRemovedProductIds();
-    const filtered = combined.filter(function(p) { return !removed.includes(p.id); });
+    const filtered = combined.filter(function (p) { return !removed.includes(p.id); });
     const overridden = applyProductOverrides(filtered);
     return attachInventoryToProducts(overridden);
 }
@@ -329,7 +329,7 @@ function renderProductCard(product) {
 
     const category = document.createElement('span');
     category.className = 'product-category-pill';
-    category.textContent = product.category ? product.category.replace(/^\w/, function(c) { return c.toUpperCase(); }) : 'Featured';
+    category.textContent = product.category ? product.category.replace(/^\w/, function (c) { return c.toUpperCase(); }) : 'Featured';
     meta.appendChild(category);
 
     const rating = document.createElement('span');
@@ -391,7 +391,7 @@ function renderProductCard(product) {
     if (outOfStock) {
         button.classList.add('disabled');
     } else {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             addToCart(product.id);
         });
     }
@@ -535,7 +535,7 @@ function renderProductsGrid(productsArray, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
     clearElement(container);
-    
+
     if (productsArray.length === 0) {
         const empty = document.createElement('p');
         empty.style.textAlign = 'center';
@@ -547,7 +547,7 @@ function renderProductsGrid(productsArray, containerId) {
         container.appendChild(empty);
         return;
     }
-    
+
     for (let i = 0; i < productsArray.length; i++) {
         container.appendChild(renderProductCard(productsArray[i]));
     }
@@ -559,3 +559,54 @@ function clearElement(el) {
         el.removeChild(el.firstChild);
     }
 }
+
+
+function setActiveCategoryPill(category) {
+    const normalized = category || '';
+    document.querySelectorAll('.pill-filter').forEach(btn => {
+        const isActive = (btn.dataset.category || '') === normalized;
+        btn.classList.toggle('active', isActive);
+    });
+}
+
+function filterProducts(categoryOverride) {
+    const categorySelect = document.getElementById('categoryFilter');
+    if (categorySelect && typeof categoryOverride !== 'undefined') {
+        categorySelect.value = categoryOverride;
+    }
+    const category = categorySelect ? categorySelect.value : '';
+    setActiveCategoryPill(category);
+    const products = category ? getProductsByCategory(category) : getAllProducts();
+    renderProductsGrid(products, 'shopProducts');
+}
+
+function sortProducts() {
+    const sortBy = document.getElementById('sortFilter').value;
+    const category = document.getElementById('categoryFilter').value;
+    let products = category ? getProductsByCategory(category) : getAllProducts();
+
+    switch (sortBy) {
+        case 'price-low':
+            products.sort((a, b) => a.price - b.price);
+            break;
+        case 'price-high':
+            products.sort((a, b) => b.price - a.price);
+            break;
+        case 'name':
+            products.sort((a, b) => a.name.localeCompare(b.name));
+            break;
+    }
+
+    setActiveCategoryPill(category);
+    renderProductsGrid(products, 'shopProducts');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.pill-filter').forEach(button => {
+        button.addEventListener('click', () => {
+            filterProducts(button.dataset.category || '');
+        });
+    });
+    const currentCategory = document.getElementById('categoryFilter')?.value || '';
+    setActiveCategoryPill(currentCategory);
+});

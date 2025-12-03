@@ -10,7 +10,7 @@ const users = JSON.parse(localStorage.getItem("users")) || [];
 
 const user = getAuthenticatedUser();
 
-if(user) {
+if (user) {
     window.location.href = "index.html"
 }
 

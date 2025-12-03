@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,10 @@
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
 
- 
+
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">
@@ -37,7 +39,8 @@
                             <button type="button" class="logout-btn">Logout</button>
                         </div>
                         <div class="user-guest">
-                            <a href="login.html" class="login-link"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+                            <a href="login.html" class="login-link"><i class="fa-solid fa-arrow-right-to-bracket"></i>
+                                Login</a>
                             <a href="signup.html" class="signup-link"><i class="fa-solid fa-user-plus"></i> Sign Up</a>
                         </div>
                     </div>
@@ -99,7 +102,7 @@
         </div>
     </section>
 
-   
+
     <section class="shop-highlights">
         <div class="container">
             <div class="shop-highlights-grid">
@@ -122,11 +125,11 @@
         </div>
     </section>
 
-  
+
     <section class="featured-products">
         <div class="container">
             <div class="products-grid" id="shopProducts">
-             
+
             </div>
         </div>
     </section>
@@ -138,7 +141,7 @@
                     <h3>Zay Shop</h3>
                     <div class="footer-info">
                         <p><i class="fas fa-map-marker-alt"></i> 266 Pristina Hasan Prishtina 2000</p>
-                        <p><i class="fas fa-phone"></i> Number: 048-286-038-049-841-813</p>
+                        <p><i class="fas fa-phone"></i> Number: 048286038-049841813</p>
                         <p><i class="fas fa-envelope"></i> info@e-zay.com</p>
                     </div>
                 </div>
@@ -164,7 +167,7 @@
             <div class="footer-bottom">
                 <p>&copy; <span id="year"></span> Zay Shop. All rights reserved.</p>
             </div>
-            
+
         </div>
     </footer>
 
@@ -177,80 +180,18 @@
         </div>
     </div>
 
-    
+
     <div class="floating-widgets">
         <button class="scroll-to-top" id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
             <i class="fas fa-arrow-up"></i>
         </button>
-    </div>
-    
-    <div class="floating-cart-widget" id="floatingCart">
-        <div class="floating-cart-items" id="floatingCartItems">
-            <p style="text-align: center; padding: 20px; color: var(--text-gray);">Your cart is empty</p>
-        </div>
-        <div class="floating-cart-footer">
-            <div class="floating-cart-total">
-                <strong>Total: $<span id="floatingCartTotal">0.00</span></strong>
-            </div>
-            <a href="cart.html" class="btn btn-primary" style="width: 100%; margin-top: 15px;">View Cart</a>
-        </div>
     </div>
 
     <script src="../assets/js/products.js"></script>
     <script src="../assets/js/cart.js"></script>
     <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/main.js"></script>
-    <script>
-        function setActiveCategoryPill(category) {
-            const normalized = category || '';
-            document.querySelectorAll('.pill-filter').forEach(btn => {
-                const isActive = (btn.dataset.category || '') === normalized;
-                btn.classList.toggle('active', isActive);
-            });
-        }
 
-        function filterProducts(categoryOverride) {
-            const categorySelect = document.getElementById('categoryFilter');
-            if (categorySelect && typeof categoryOverride !== 'undefined') {
-                categorySelect.value = categoryOverride;
-            }
-            const category = categorySelect ? categorySelect.value : '';
-            setActiveCategoryPill(category);
-            const products = category ? getProductsByCategory(category) : getAllProducts();
-            renderProductsGrid(products, 'shopProducts');
-        }
-
-        function sortProducts() {
-            const sortBy = document.getElementById('sortFilter').value;
-            const category = document.getElementById('categoryFilter').value;
-            let products = category ? getProductsByCategory(category) : getAllProducts();
-            
-            switch(sortBy) {
-                case 'price-low':
-                    products.sort((a, b) => a.price - b.price);
-                    break;
-                case 'price-high':
-                    products.sort((a, b) => b.price - a.price);
-                    break;
-                case 'name':
-                    products.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-            }
-            
-            setActiveCategoryPill(category);
-            renderProductsGrid(products, 'shopProducts');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.pill-filter').forEach(button => {
-                button.addEventListener('click', () => {
-                    filterProducts(button.dataset.category || '');
-                });
-            });
-            const currentCategory = document.getElementById('categoryFilter')?.value || '';
-            setActiveCategoryPill(currentCategory);
-        });
-    </script>
 </body>
-</html>
 
+</html>
