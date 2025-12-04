@@ -1,89 +1,113 @@
-const form = document.getElementById("form");
-const fullname = document.getElementById("signupName");
-const email = document.getElementById("signupEmail");
-const password = document.getElementById("signupPassword");
-const confirmPassword = document.getElementById("signupConfirm");
+const signupForm = document.getElementById("form");
+const signupName = document.getElementById("signupName");
+const signupEmail = document.getElementById("signupEmail");
+const signupPassword = document.getElementById("signupPassword");
+const signupConfirm = document.getElementById("signupConfirm");
 
-const users = JSON.parse(localStorage.getItem("users")) || [];
+if (signupForm && signupName && signupEmail && signupPassword && signupConfirm) {
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const existingUser = getAuthenticatedUser();
 
-const user = getAuthenticatedUser();
-
-if (user) {
-    window.location.href = "index.html"
-}
-
-function setError(input, message) {
-    const parent = input.parentElement;
-    parent.querySelector(".error").textContent = message;
-    input.classList.add("error-input");
-}
-
-function setSuccess(input) {
-    const parent = input.parentElement;
-    parent.querySelector(".error").textContent = "";
-    input.classList.remove("error-input");
-}
-
-function validateEmail(emailValue) {
-    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return pattern.test(emailValue);
-}
-
-
-form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    let valid = true;
-
-    if (fullname.value.trim().length < 3) {
-        setError(fullname, "Enter at least 3 characters.");
-        valid = false;
-    } else {
-        setSuccess(fullname)
+    if (existingUser) {
+        window.location.href = "index.html";
     }
 
-
-    if (!validateEmail(email.value.trim())) {
-        setError(email, "Enter a valid email");
-        valid = false;
-    } else {
-        setSuccess(email);
+    function showError(input, message) {
+        const parent = input.parentElement;
+        let errorEl = parent.querySelector(".error");
+        if (!errorEl) {
+            errorEl = document.createElement("p");
+            errorEl.className = "error";
+            parent.appendChild(errorEl);
+        }
+        errorEl.textContent = message;
+        input.classList.add("error-input");
     }
 
-
-    if (password.value.trim().length < 6) {
-        setError(password, "Password must be 6+ characters");
-        valid = false;
-    } else {
-        setSuccess(password);
+    function clearError(input) {
+        const parent = input.parentElement;
+        const errorEl = parent.querySelector(".error");
+        if (errorEl) errorEl.textContent = "";
+        input.classList.remove("error-input");
     }
 
-
-    if (confirmPassword.value.trim() !== password.value.trim()) {
-        setError(confirmPassword, "Password do not match");
-        valid = false;
-    } else {
-        setSuccess(confirmPassword);
+    function isValidEmail(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     }
 
-    const emailExists = users.some(user => user.email === email.value.trim());
-    if (emailExists) {
-        setError(email, "This email is already registered.");
-        valid = false;
+    function isStrongPassword(value) {
+        const trimmed = value.trim();
+        if (trimmed.length < 8) return "Password must be at least 8 characters.";
+        if (!/[A-Z]/.test(trimmed) || !/[a-z]/.test(trimmed) || !/[0-9]/.test(trimmed)) {
+            return "Use upper, lower, and a number.";
+        }
+        return "";
     }
 
+    function emailTaken(value) {
+        return users.some(u => u.email === value);
+    }
 
-    if (valid) {
-        users.push({
-            fullname: fullname.value,
-            email: email.value,
-            password: password.value,
+    function validateForm() {
+        let ok = true;
+        const nameVal = signupName.value.trim();
+        const emailVal = signupEmail.value.trim();
+        const passVal = signupPassword.value.trim();
+        const confirmVal = signupConfirm.value.trim();
+
+        if (nameVal.length < 3) {
+            showError(signupName, "Enter at least 3 characters.");
+            ok = false;
+        } else {
+            clearError(signupName);
+        }
+
+        if (!isValidEmail(emailVal)) {
+            showError(signupEmail, "Enter a valid email.");
+            ok = false;
+        } else if (emailTaken(emailVal)) {
+            showError(signupEmail, "This email is already registered.");
+            ok = false;
+        } else {
+            clearError(signupEmail);
+        }
+
+        const passwordMsg = isStrongPassword(passVal);
+        if (passwordMsg) {
+            showError(signupPassword, passwordMsg);
+            ok = false;
+        } else {
+            clearError(signupPassword);
+        }
+
+        if (!confirmVal || confirmVal !== passVal) {
+            showError(signupConfirm, "Passwords must match.");
+            ok = false;
+        } else {
+            clearError(signupConfirm);
+        }
+
+        return ok;
+    }
+
+    function saveUser(user) {
+        users.push(user);
+        localStorage.setItem("users", JSON.stringify(users));
+        localStorage.setItem("loggedInUser", JSON.stringify(user));
+    }
+
+    signupForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (!validateForm()) return;
+
+        const newUser = {
+            fullname: signupName.value.trim(),
+            email: signupEmail.value.trim(),
+            password: signupPassword.value.trim(),
             role: "user"
-        })
-        window.location.href = "login.html"
+        };
 
-    }
-
-    localStorage.setItem("users", JSON.stringify(users))
-
-})
+        saveUser(newUser);
+        window.location.href = "login.html";
+    });
+}
