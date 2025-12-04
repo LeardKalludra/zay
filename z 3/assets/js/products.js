@@ -15,7 +15,7 @@ const products = [
         id: 2,
         name: "Zay Watch Pro",
         price: 480.00,
-        image: "http://127.0.0.1:5500/z%203/public/images/watch.png",
+        image: "https://images6.alphacoders.com/394/thumb-1920-394174.jpg",
         description: "Advanced smartwatch with health tracking, GPS, and premium design. Water resistant.",
         rating: 5,
         reviews: 48,
