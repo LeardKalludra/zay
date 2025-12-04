@@ -517,6 +517,69 @@ function showNotification(message) {
     }, 2000);
 }
 
+function updateFloatingCart() {
+    syncCartFromStorage();
+    const floatingCartItems = document.getElementById('floatingCartItems');
+    const floatingCartTotal = document.getElementById('floatingCartTotal');
+    const floatingCartCount = document.querySelector('.floating-cart-count');
+
+    if (floatingCartCount) {
+        let count = 0;
+        for (let i = 0; i < cart.length; i++) {
+            count += cart[i].quantity;
+        }
+        floatingCartCount.textContent = count;
+    }
+
+    if (!floatingCartItems) return;
+    clearElement(floatingCartItems);
+
+    if (cart.length === 0) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.style.textAlign = 'center';
+        emptyMsg.style.padding = '20px';
+        emptyMsg.style.color = 'var(--text-gray)';
+        emptyMsg.textContent = 'Your cart is empty';
+        floatingCartItems.appendChild(emptyMsg);
+        if (floatingCartTotal) floatingCartTotal.textContent = '0.00';
+        return;
+    }
+
+    cart.forEach(function (item) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'floating-cart-item';
+
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.alt = item.name;
+        wrapper.appendChild(img);
+
+        const info = document.createElement('div');
+        info.className = 'floating-cart-item-info';
+        const title = document.createElement('h5');
+        title.textContent = item.name;
+        const meta = document.createElement('p');
+        meta.textContent = '$' + item.price.toFixed(2) + ' x ' + item.quantity;
+        info.appendChild(title);
+        info.appendChild(meta);
+
+        wrapper.appendChild(info);
+        floatingCartItems.appendChild(wrapper);
+    });
+
+    if (floatingCartTotal) {
+        let total = 0;
+        for (let i = 0; i < cart.length; i++) {
+            total += cart[i].price * cart[i].quantity;
+        }
+        floatingCartTotal.textContent = total.toFixed(2);
+    }
+}
+
+function initFloatingCart() {
+    updateFloatingCart();
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         updateCartCount();
@@ -524,9 +587,7 @@ if (document.readyState === 'loading') {
             renderCart();
             renderOrderHistory();
         }
-        if (typeof updateFloatingCart === 'function') {
-            updateFloatingCart();
-        }
+        initFloatingCart();
     });
 } else {
     updateCartCount();
@@ -534,9 +595,7 @@ if (document.readyState === 'loading') {
         renderCart();
         renderOrderHistory();
     }
-    if (typeof updateFloatingCart === 'function') {
-        updateFloatingCart();
-    }
+    initFloatingCart();
 }
 
 window.updateFloatingCartOnChange = function () {

@@ -15,7 +15,7 @@ const products = [
         id: 2,
         name: "Zay Watch Pro",
         price: 480.00,
-        image: "http://127.0.0.1:5500/z%203/public/images/watch.png",
+        image: "https://images6.alphacoders.com/394/thumb-1920-394174.jpg",
         description: "Advanced smartwatch with health tracking, GPS, and premium design. Water resistant.",
         rating: 5,
         reviews: 48,
@@ -601,6 +601,103 @@ function sortProducts() {
     renderProductsGrid(products, 'shopProducts');
 }
 
+function displaySearchResults(results, container) {
+    clearElement(container);
+    if (results.length === 0) {
+        const empty = document.createElement('p');
+        empty.style.padding = '20px';
+        empty.style.textAlign = 'center';
+        empty.style.color = '#999';
+        empty.textContent = 'No products found.';
+        container.appendChild(empty);
+        return;
+    }
+
+    results.forEach(function (product) {
+        const item = document.createElement('div');
+        item.className = 'search-result-item';
+        item.addEventListener('click', function () {
+            window.location.href = 'shop.html';
+        });
+
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.gap = '15px';
+        row.style.alignItems = 'center';
+
+        const img = document.createElement('img');
+        img.src = product.image;
+        img.alt = product.name;
+        img.style.width = '60px';
+        img.style.height = '60px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '5px';
+
+        const info = document.createElement('div');
+        const title = document.createElement('h4');
+        title.style.marginBottom = '5px';
+        title.textContent = product.name;
+        const price = document.createElement('p');
+        price.style.color = '#666';
+        price.style.fontSize = '14px';
+        price.textContent = '$' + product.price.toFixed(2);
+        info.appendChild(title);
+        info.appendChild(price);
+
+        row.appendChild(img);
+        row.appendChild(info);
+        item.appendChild(row);
+        container.appendChild(item);
+    });
+}
+
+function loadFeaturedProducts() {
+    const featuredProducts = getFeaturedProducts();
+    renderProductsGrid(featuredProducts, 'featuredProducts');
+}
+
+function filterFeaturedProducts(category) {
+    document.querySelectorAll('.filter-btn').forEach(function (btn) {
+        btn.classList.remove('active');
+    });
+
+    const trigger = (typeof event !== 'undefined' && event?.currentTarget) || (typeof event !== 'undefined' && event?.target);
+    if (trigger) {
+        trigger.classList.add('active');
+    }
+
+    const products = category === 'all' ? getAllProducts() : getProductsByCategory(category);
+    renderProductsGrid(products, 'featuredProducts');
+}
+
+function loadShopProducts() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+
+    const productsToShow = category ? getProductsByCategory(category) : getAllProducts();
+    renderProductsGrid(productsToShow, 'shopProducts');
+
+    const categorySelect = document.getElementById('categoryFilter');
+    if (categorySelect) {
+        categorySelect.value = category || '';
+    }
+    setActiveCategoryPill(category || '');
+
+    if (category) {
+        const categoryNames = {
+            'watches': 'Watches',
+            'shoes': 'Shoes',
+            'accessories': 'Accessories',
+            'technology': 'Technology'
+        };
+        const categoryName = categoryNames[category] || category;
+        const pageHeader = document.querySelector('.shop-header h1');
+        if (pageHeader) {
+            pageHeader.textContent = categoryName;
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.pill-filter').forEach(button => {
         button.addEventListener('click', () => {
@@ -609,4 +706,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     const currentCategory = document.getElementById('categoryFilter')?.value || '';
     setActiveCategoryPill(currentCategory);
+
+    const isHomePage = window.location.pathname.includes('index.html') ||
+        window.location.pathname === '/' ||
+        window.location.pathname.endsWith('/');
+
+    if (isHomePage) {
+        loadFeaturedProducts();
+    }
+
+    if (window.location.pathname.includes('shop.html')) {
+        loadShopProducts();
+    }
 });
