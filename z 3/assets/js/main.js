@@ -314,11 +314,15 @@ function loadFeaturedProducts() {
     renderProductsGrid(featuredProducts, 'featuredProducts');
 }
 
-function filterProducts(category) {
+function filterFeaturedProducts(category) {
     document.querySelectorAll('.filter-btn').forEach(function (btn) {
         btn.classList.remove('active');
     });
-    event.target.classList.add('active');
+
+    const trigger = (typeof event !== 'undefined' && event?.currentTarget) || (typeof event !== 'undefined' && event?.target);
+    if (trigger) {
+        trigger.classList.add('active');
+    }
 
     const products = category === 'all' ? getAllProducts() : getProductsByCategory(category);
     renderProductsGrid(products, 'featuredProducts');
@@ -343,7 +347,8 @@ function loadShopProducts() {
         const categoryNames = {
             'watches': 'Watches',
             'shoes': 'Shoes',
-            'accessories': 'Accessories'
+            'accessories': 'Accessories',
+            'technology': 'Technology'
         };
         const categoryName = categoryNames[category] || category;
         const pageHeader = document.querySelector('.shop-header h1');
