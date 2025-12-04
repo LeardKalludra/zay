@@ -307,7 +307,7 @@
                     <h2>Get Discount 30% Off</h2>
                     <p>Subscribe to our newsletter and get special offers and discount codes</p>
                 </div>
-                <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+                <form class="newsletter-form" id="newsletterForm">
                     <input type="email" placeholder="Enter your email address" required>
                     <button type="submit" class="btn btn-primary">Subscribe</button>
                 </form>
@@ -379,10 +379,17 @@
                 <a href="cart.html" class="btn btn-primary" style="width: 100%; margin-top: 15px;">View Cart</a>
             </div>
         </div>
-
-
-
+    
+        <div id="successPopup" class="success-popup">
+    <div class="success-card">
+        <div class="success-icon">✓</div>
+        <h3>Message Sent</h3>
+        <p>Your form has been submitted successfully.</p>
+        <button id="closePopup" class="close-btn">Continue</button>
     </div>
+</div>
+
+</div>
 
     <script src="../assets/js/products.js"></script>
     <script src="../assets/js/cart.js"></script>

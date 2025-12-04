@@ -353,10 +353,22 @@ function loadShopProducts() {
     }
 }
 
-function handleNewsletter(event) {
-    event.preventDefault();
-    const email = event.target.querySelector('input[type="email"]').value;
-    alert('Thank you for subscribing! We\'ll send you exclusive offers and updates.');
-    event.target.reset();
+const form = document.getElementById("newsletterForm");
+
+form.addEventListener("submit",(e) => {
+    e.preventDefault();
+    showSuccessPopup();
+})
+
+
+const successPopup = document.getElementById("successPopup");
+const closePopup = document.getElementById("closePopup");
+
+function showSuccessPopup() {
+    successPopup.style.display = "flex";
 }
 
+closePopup.addEventListener("click", () => {
+    successPopup.style.display = "none";
+    form.reset()
+});
