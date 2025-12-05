@@ -26,12 +26,6 @@ function collectDashboardData() {
     const ordersHistory = getOrders();
     const settingsPrefs = getSettingsPrefs();
 
-    if (!users.length && !carts.length) {
-        const sample = buildSampleData();
-        users = sample.users;
-        carts = sample.carts;
-    }
-
     const orderSource = ordersHistory.length ? ordersHistory : carts;
     const sortedOrders = orderSource.slice().sort(function (a, b) {
         const aDate = a.date ? new Date(a.date).getTime() : 0;
@@ -139,43 +133,6 @@ function getOrders() {
     } catch (e) {
         return [];
     }
-}
-
-function buildSampleData() {
-    let baseProducts = (typeof products !== 'undefined' ? products.slice(0, 4) : []).map(function (p) {
-        return {
-            id: p.id,
-            name: p.name,
-            price: p.price,
-            image: p.image,
-            category: p.category || 'general',
-            quantity: 1
-        };
-    });
-
-    if (!baseProducts.length) {
-        baseProducts = [
-            { id: 1, name: 'Sample Watch', price: 199, image: '', category: 'watches', quantity: 1 },
-            { id: 2, name: 'Sample Shoes', price: 149, image: '', category: 'shoes', quantity: 1 },
-            { id: 3, name: 'Sample Earbuds', price: 89, image: '', category: 'accessories', quantity: 1 }
-        ];
-    }
-
-    const sampleUsers = [
-        { fullname: 'Alex Morgan', email: 'alex@example.com', role: 'user' },
-        { fullname: 'Jamie Fox', email: 'jamie@example.com', role: 'user' }
-    ];
-
-    const sampleCarts = [
-        { owner: sampleUsers[0].email, items: baseProducts.slice(0, 2), total: sumItems(baseProducts.slice(0, 2)), date: new Date() },
-        { owner: sampleUsers[1].email, items: baseProducts.slice(1, 4), total: sumItems(baseProducts.slice(1, 4)), date: new Date() }
-    ];
-
-    return { users: sampleUsers, carts: sampleCarts };
-}
-
-function sumItems(items) {
-    return items.reduce(function (sum, item) { return sum + (item.price * item.quantity); }, 0);
 }
 
 function renderMetrics(data) {
@@ -430,7 +387,7 @@ function renderAnalytics(data) {
             trend.appendChild(document.createTextNode(' ' + item.change));
             card.appendChild(label);
             card.appendChild(value);
-            card.appendChild(trend);
+            // card.appendChild(trend);
             cards.appendChild(card);
         });
     }
